@@ -1,0 +1,5197 @@
+This is signal.info, produced by makeinfo version 7.0.2 from
+signal.texi.
+
+INFO-DIR-SECTION Math
+START-INFO-DIR-ENTRY
+* Octave Signal: (signal).          Signal Toolkit for Octave
+END-INFO-DIR-ENTRY
+
+
+File: signal.info,  Node: Top,  Next: Overview,  Up: (dir)
+
+Octave Signal Toolkit
+*********************
+
+Copyright © The Octave Project Developers
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+* Menu:
+
+* Overview::
+* Installing and loading::
+* Function Reference::
+
+
+File: signal.info,  Node: Overview,  Next: Installing and loading,  Prev: Top,  Up: Top
+
+1 Overview
+**********
+
+The Signal Toolkit contains signal processing tools, including
+filtering, windowing and display functions.
+
+
+File: signal.info,  Node: Installing and loading,  Next: Function Reference,  Prev: Overview,  Up: Top
+
+2 Installing and loading
+************************
+
+The Signal Toolkit must be installed and then loaded to be used.
+
+It can be installed in GNU Octave directly from octave-forge,
+
+2.1 Windows install
+===================
+
+If running in Windows, the package may already be installed, to check
+run:
+
+     pkg list signal
+
+2.2 Installing
+==============
+
+With an internet connection available, the Signal package can be
+installed from octave-forge using the following command within GNU
+Octave:
+
+     pkg install -forge signal
+
+The latest released version of the toolkit will be downloaded and
+installed.
+
+Otherwise, if the package file has already been downloaded it can be
+installed using the follwoing command in GNU Octave:
+
+     pkg install signal-1.4.5.tar.gz
+
+2.3 Loading
+===========
+
+Regardless of the method of installing the toolkit, in order to use its
+functions, the toolkit must be loaded using the pkg load command:
+
+     pkg load signal
+
+The toolkit must be loaded on each GNU Octave session.
+
+
+File: signal.info,  Node: Function Reference,  Prev: Installing and loading,  Up: Top
+
+3 Function Reference
+********************
+
+* Menu:
+
+* Signals::
+* Signal Measurement::
+* Correlation and Convolution::
+* Filtering::
+* Filter Analysis::
+* Filter Conversion::
+* IIR Filter Design::
+* FIR Filter Design::
+* Transforms::
+* Power Spectrum Analysis::
+* Window Functions::
+* System Identification::
+* Sample Rate Change::
+* Pulse Metrics::
+* Utility::
+
+
+File: signal.info,  Node: Signals,  Next: Signal Measurement,  Up: Function Reference
+
+3.1 Signals
+===========
+
+3.1.1 buffer
+------------
+
+ -- Function File: Y = buffer (X, N, P, OPT)
+ -- Function File: [Y, Z, OPT] = buffer (...)
+     Buffer a signal into a data frame.  The arguments to ‘buffer’ are
+
+     X
+          The data to be buffered.
+
+     N
+          The number of rows in the produced data buffer.  This is an
+          positive integer value and must be supplied.
+
+     P
+          An integer less than N that specifies the under- or overlap
+          between column in the data frame.  The default value of P is
+          0.
+
+     OPT
+          In the case of an overlap, OPT can be either a vector of
+          length P or the string ’nodelay’.  If OPT is a vector, then
+          the first P entries in Y will be filled with these values.  If
+          OPT is the string ’nodelay’, then the first value of Y
+          corresponds to the first value of X.
+
+          In the can of an underlap, OPT must be an integer between 0
+          and ‘-P’.  The represents the initial underlap of the first
+          column of Y.
+
+          The default value for OPT the vector ‘zeros (1, P)’ in the
+          case of an overlap, or 0 otherwise.
+
+     In the case of a single output argument, Y will be padded with
+     zeros to fill the missing values in the data frame.  With two
+     output arguments Z is the remaining data that has not been used in
+     the current data frame.
+
+     Likewise, the output OPT is the overlap, or underlap that might be
+     used for a future call to ‘code’ to allow continuous buffering.
+
+3.1.2 chirp
+-----------
+
+ -- Function File: chirp (T)
+ -- Function File: chirp (T, F0)
+ -- Function File: chirp (T, F0, T1)
+ -- Function File: chirp (T, F0, T1, F1)
+ -- Function File: chirp (T, F0, T1, F1, SHAPE)
+ -- Function File: chirp (T, F0, T1, F1, SHAPE, PHASE)
+
+     Evaluate a chirp signal at time T.  A chirp signal is a frequency
+     swept cosine wave.
+
+     T
+          vector of times to evaluate the chirp signal
+     F0
+          frequency at time t=0 [ 0 Hz ]
+     T1
+          time t1 [ 1 sec ]
+     F1
+          frequency at time t=t1 [ 100 Hz ]
+     SHAPE
+          shape of frequency sweep ’linear’ f(t) = (f1-f0)*(t/t1) + f0
+          ’quadratic’ f(t) = (f1-f0)*(t/t1)^2 + f0 ’logarithmic’ f(t) =
+          (f1/f0)^(t/t1) * f0
+     PHASE
+          phase shift at t=0
+
+     For example:
+
+           specgram (chirp ([0:0.001:5]));  # default linear chirp of 0-100Hz in 1 sec
+           specgram (chirp ([-2:0.001:15], 400, 10, 100, "quadratic"));
+           soundsc (chirp ([0:1/8000:5], 200, 2, 500, "logarithmic"), 8000);
+
+     If you want a different sweep shape f(t), use the following:
+
+      y = cos (2 * pi * integral (f(t)) + phase);
+
+3.1.3 cmorwavf
+--------------
+
+ -- Function File: [PSI, X] = cmorwavf (LB, UB, N, FB, FC)
+     Compute the Complex Morlet wavelet.
+
+3.1.4 diric
+-----------
+
+ -- Function File: Y = diric (X,N)
+     Compute the dirichlet function.
+
+     See also: sinc, gauspuls, sawtooth.
+
+3.1.5 gauspuls
+--------------
+
+ -- Function File: Y = gauspuls (T)
+ -- Function File: Y = gauspuls (T, FC)
+ -- Function File: Y = gauspuls (T, FC, BW)
+     Generate a Gaussian modulated sinusoidal pulse sampled at times T.
+
+     See also: pulstran, rectpuls, tripuls.
+
+3.1.6 gmonopuls
+---------------
+
+ -- Function File: Y = gmonopuls (T,FC)
+     Return the gaussian monopulse.
+
+3.1.7 mexihat
+-------------
+
+ -- Function File: [PSI, X] = mexihat (LB, UB, N)
+     Compute the Mexican hat wavelet.
+
+3.1.8 meyeraux
+--------------
+
+ -- Function File: Y = meyeraux (X)
+     Compute the Meyer wavelet auxiliary function.
+
+3.1.9 morlet
+------------
+
+ -- Function File: [PSI, X] = morlet (LB, UB, N)
+     Compute the Morlet wavelet.
+
+3.1.10 pulstran
+---------------
+
+ -- Function File: Y = pulstran (T, D, FUNC, ...)
+ -- Function File: Y = pulstran (T, D, P)
+ -- Function File: Y = pulstran (T, D, P, FS)
+ -- Function File: Y = pulstran (T, D, P, FS, METHOD)
+
+     Generate the signal y=sum(func(t+d,...))  for each d.  If d is a
+     matrix of two columns, the first column is the delay d and the
+     second column is the amplitude a, and y=sum(a*func(t+d)) for each
+     d,a.  Clearly, func must be a function which accepts a vector of
+     times.  Any extra arguments needed for the function must be tagged
+     on the end.
+
+     Example:
+           fs = 11025;  # arbitrary sample rate
+           f0 = 100;    # pulse train sample rate
+           w = 0.001;   # pulse width of 1 millisecond
+           auplot (pulstran (0:1/fs:0.1, 0:1/f0:0.1, "rectpuls", w), fs);
+
+     If instead of a function name you supply a pulse shape sampled at
+     frequency Fs (default 1 Hz), an interpolated version of the pulse
+     is added at each delay d.  The interpolation stays within the the
+     time range of the delayed pulse.  The interpolation method defaults
+     to linear, but it can be any interpolation method accepted by the
+     function interp1.
+
+     Example:
+           fs = 11025;      # arbitrary sample rate
+           f0 = 100;        # pulse train sample rate
+           w = boxcar(10);  # pulse width of 1 millisecond at 10 kHz
+           auplot (pulstran (0:1/fs:0.1, 0:1/f0:0.1, w, 10000), fs);
+
+3.1.11 rectpuls
+---------------
+
+ -- Function File: Y = rectpuls (T)
+ -- Function File: Y = rectpuls (T, W)
+     Generate a rectangular pulse over the interval [-W/2,W/2), sampled
+     at times T.  This is useful with the function ‘pulstran’ for
+     generating a series of pulses.
+
+     Example:
+           fs = 11025;  # arbitrary sample rate
+           f0 = 100;    # pulse train sample rate
+           w = 0.3/f0;  # pulse width 3/10th the distance between pulses
+           plot (pulstran (0:1/fs:4/f0, 0:1/f0:4/f0, "rectpuls", w));
+
+     See also: gauspuls, pulstran, tripuls.
+
+3.1.12 sawtooth
+---------------
+
+ -- Function File: Y = sawtooth (T)
+ -- Function File: Y = sawtooth (T, WIDTH)
+     Generates a sawtooth wave of period ‘2 * pi’ with limits ‘+1/-1’
+     for the elements of T.
+
+     WIDTH is a real number between ‘0’ and ‘1’ which specifies the
+     point between ‘0’ and ‘2 * pi’ where the maximum is.  The function
+     increases linearly from ‘-1’ to ‘1’ in ‘[0, 2 * pi * WIDTH]’
+     interval, and decreases linearly from ‘1’ to ‘-1’ in the interval
+     ‘[2 * pi * WIDTH, 2 * pi]’.
+
+     If WIDTH is 0.5, the function generates a standard triangular wave.
+
+     If WIDTH is not specified, it takes a value of 1, which is a
+     standard sawtooth function.
+
+3.1.13 shanwavf
+---------------
+
+ -- Function File: [PSI, X] = shanwavf (LB, UB, N, FB, FC)
+     Compute the Complex Shannon wavelet.
+
+3.1.14 shiftdata
+----------------
+
+ -- Function File: [OUT PERM SHIFTS] = shiftdata (IN)
+ -- Function File: [OUT PERM SHIFTS] = shiftdata (IN, DIM)
+     Shift data IN to permute the dimension DIM to the first column.
+
+     See also: unshiftdata.
+
+3.1.15 sigmoid_train
+--------------------
+
+ -- Function File: [Y S] = sigmoid_train (T, RANGES, RC)
+
+     Evaluate a train of sigmoid functions at T.
+
+     The number and duration of each sigmoid is determined from RANGES.
+     Each row of RANGES represents a real interval, e.g.  if sigmoid ‘i’
+     starts at ‘t=0.1’ and ends at ‘t=0.5’, then ‘RANGES(i,:) = [0.1
+     0.5]’.  The input RC is an array that defines the rising and
+     falling time constants of each sigmoid.  Its size must equal the
+     size of RANGES.
+
+     The individual sigmoids are returned in S.  The combined sigmoid
+     train is returned in the vector Y of length equal to T, and such
+     that ‘Y = max (S)’.
+
+     Run ‘demo sigmoid_train’ to some examples of the use of this
+     function.
+
+3.1.16 specgram
+---------------
+
+ -- Function File: specgram (X)
+ -- Function File: specgram (X, N)
+ -- Function File: specgram (X, N, FS)
+ -- Function File: specgram (X, N, FS, WINDOW)
+ -- Function File: specgram (X, N, FS, WINDOW, OVERLAP)
+ -- Function File: [S, F, T] = specgram (...)
+
+     Generate a spectrogram for the signal X.  The signal is chopped
+     into overlapping segments of length N, and each segment is windowed
+     and transformed into the frequency domain using the FFT. The
+     default segment size is 256.  If FS is given, it specifies the
+     sampling rate of the input signal.  The argument WINDOW specifies
+     an alternate window to apply rather than the default of ‘hanning
+     (N)’.  The argument OVERLAP specifies the number of samples overlap
+     between successive segments of the input signal.  The default
+     overlap is ‘length (WINDOW)/2’.
+
+     If no output arguments are given, the spectrogram is displayed.
+     Otherwise, S is the complex output of the FFT, one row per slice, F
+     is the frequency indices corresponding to the rows of S, and T is
+     the time indices corresponding to the columns of S.
+
+     Example:
+              x = chirp([0:0.001:2],0,2,500);  # freq. sweep from 0-500 over 2 sec.
+              Fs=1000;                  # sampled every 0.001 sec so rate is 1 kHz
+              step=ceil(20*Fs/1000);    # one spectral slice every 20 ms
+              window=ceil(100*Fs/1000); # 100 ms data window
+              specgram(x, 2^nextpow2(window), Fs, window, window-step);
+
+              ## Speech spectrogram
+              [x, Fs] = auload(file_in_loadpath("sample.wav")); # audio file
+              step = fix(5*Fs/1000);     # one spectral slice every 5 ms
+              window = fix(40*Fs/1000);  # 40 ms data window
+              fftn = 2^nextpow2(window); # next highest power of 2
+              [S, f, t] = specgram(x, fftn, Fs, window, window-step);
+              S = abs(S(2:fftn*4000/Fs,:)); # magnitude in range 0<f<=4000 Hz.
+              S = S/max(S(:));           # normalize magnitude so that max is 0 dB.
+              S = max(S, 10^(-40/10));   # clip below -40 dB.
+              S = min(S, 10^(-3/10));    # clip above -3 dB.
+              imagesc (t, f, log(S));    # display in log scale
+              set (gca, "ydir", "normal"); # put the 'y' direction in the correct direction
+
+     The choice of window defines the time-frequency resolution.  In
+     speech for example, a wide window shows more harmonic detail while
+     a narrow window averages over the harmonic detail and shows more
+     formant structure.  The shape of the window is not so critical so
+     long as it goes gradually to zero on the ends.
+
+     Step size (which is window length minus overlap) controls the
+     horizontal scale of the spectrogram.  Decrease it to stretch, or
+     increase it to compress.  Increasing step size will reduce time
+     resolution, but decreasing it will not improve it much beyond the
+     limits imposed by the window size (you do gain a little bit,
+     depending on the shape of your window, as the peak of the window
+     slides over peaks in the signal energy).  The range 1-5 msec is
+     good for speech.
+
+     FFT length controls the vertical scale.  Selecting an FFT length
+     greater than the window length does not add any information to the
+     spectrum, but it is a good way to interpolate between frequency
+     points which can make for prettier spectrograms.
+
+     After you have generated the spectral slices, there are a number of
+     decisions for displaying them.  First the phase information is
+     discarded and the energy normalized:
+
+     S = abs(S); S = S/max(S(:));
+
+     Then the dynamic range of the signal is chosen.  Since information
+     in speech is well above the noise floor, it makes sense to
+     eliminate any dynamic range at the bottom end.  This is done by
+     taking the max of the magnitude and some minimum energy such as
+     minE=-40dB. Similarly, there is not much information in the very
+     top of the range, so clipping to a maximum energy such as maxE=-3dB
+     makes sense:
+
+     S = max(S, 10^(minE/10)); S = min(S, 10^(maxE/10));
+
+     The frequency range of the FFT is from 0 to the Nyquist frequency
+     of one half the sampling rate.  If the signal of interest is band
+     limited, you do not need to display the entire frequency range.  In
+     speech for example, most of the signal is below 4 kHz, so there is
+     no reason to display up to the Nyquist frequency of 10 kHz for a 20
+     kHz sampling rate.  In this case you will want to keep only the
+     first 40% of the rows of the returned S and f.  More generally, to
+     display the frequency range [minF, maxF], you could use the
+     following row index:
+
+     idx = (f >= minF & f <= maxF);
+
+     Then there is the choice of colormap.  A brightness varying
+     colormap such as copper or bone gives good shape to the ridges and
+     valleys.  A hue varying colormap such as jet or hsv gives an
+     indication of the steepness of the slopes.  The final spectrogram
+     is displayed in log energy scale and by convention has low
+     frequencies on the bottom of the image:
+
+     imagesc(t, f, flipud(log(S(idx,:))));
+
+3.1.17 square
+-------------
+
+ -- Function File: S = square (T, DUTY)
+ -- Function File: S = square (T)
+     Generate a square wave of period 2 pi with limits +1/-1.
+
+     If DUTY is specified, it is the percentage of time the square wave
+     is "on".  The square wave is +1 for that portion of the time.
+
+                        on time * 100
+         duty cycle = ------------------
+                      on time + off time
+
+     See also: cos, sawtooth, sin, tripuls.
+
+3.1.18 tripuls
+--------------
+
+ -- Function File: Y = tripuls (T)
+ -- Function File: Y = tripuls (T, W)
+ -- Function File: Y = tripuls (T, W, SKEW)
+     Generate a triangular pulse over the interval [-W/2,W/2), sampled
+     at times T.  This is useful with the function ‘pulstran’ for
+     generating a series of pulses.
+
+     SKEW is a value between -1 and 1, indicating the relative placement
+     of the peak within the width.  -1 indicates that the peak should be
+     at -W/2, and 1 indicates that the peak should be at W/2.  The
+     default value is 0.
+
+     Example:
+           fs = 11025;  # arbitrary sample rate
+           f0 = 100;    # pulse train sample rate
+           w = 0.3/f0;  # pulse width 3/10th the distance between pulses
+           plot (pulstran (0:1/fs:4/f0, 0:1/f0:4/f0, "tripuls", w));
+
+     See also: gauspuls, pulstran, rectpuls.
+
+3.1.19 udecode
+--------------
+
+ -- Function File: OUT = udecode (IN, N)
+ -- Function File: OUT = udecode (IN, N, V)
+ -- Function File: OUT = udecode (IN, N, V, OVERFLOWS)
+     Invert the operation of uencode.
+
+     See also: uencode.
+
+3.1.20 uencode
+--------------
+
+ -- Function File: OUT = uencode (IN, N)
+ -- Function File: OUT = uencode (IN, N, V)
+ -- Function File: OUT = uencode (IN, N, V, SIGNED)
+     Quantize the entries of the array IN using 2^N quantization levels.
+
+     See also: udecode.
+
+3.1.21 unshiftdata
+------------------
+
+ -- Function File: [OUT] = unshiftdata (IN, PERM, SHIFTS)
+     Reverse what is done by shiftdata.
+
+     See also: shiftdata.
+
+3.1.22 vco
+----------
+
+ -- : y = vco (X, FC, FS)
+ -- : y = vco (X, [FMIN, FMAX], FS)
+     Creates a signal that oscillates at a frequency determined by input
+     X with a sampling frequency FS.
+
+     Inputs:
+        • X - input data with a range of -1 to 1.  A value of -1 means
+          no output, 0 cuoreesponds to FC, and 1 corresponds to 2*FC.
+
+        • FC - Carrier frequency
+
+        • FS - Sampling rate
+
+        • FMIN, FMAX - Frequency modulation range limits.
+
+     Outputs:
+        • Y - output signal
+
+
+File: signal.info,  Node: Signal Measurement,  Next: Correlation and Convolution,  Prev: Signals,  Up: Function Reference
+
+3.2 Signal Measurement
+======================
+
+3.2.1 findpeaks
+---------------
+
+ -- Function File: [PKS, LOC, EXTRA] = findpeaks (DATA)
+ -- Function File: ... = findpeaks (..., PROPERTY, VALUE)
+ -- Function File: ... = findpeaks (..., "DoubleSided")
+     Finds peaks on DATA.
+
+     Peaks of a positive array of data are defined as local maxima.  For
+     double-sided data, they are maxima of the positive part and minima
+     of the negative part.  DATA is expected to be a single column
+     vector.
+
+     The function returns the value of DATA at the peaks in PKS.  The
+     index indicating their position is returned in LOC.
+
+     The third output argument is a structure with additional
+     information:
+
+     "parabol"
+          A structure containing the parabola fitted to each returned
+          peak.  The structure has two fields, "x" and "pp".  The field
+          "pp" contains the coefficients of the 2nd degree polynomial
+          and "x" the extrema of the interval where it was fitted.
+
+     "height"
+          The estimated height of the returned peaks (in units of DATA).
+
+     "baseline"
+          The height at which the roots of the returned peaks were
+          calculated (in units of DATA).
+
+     "roots"
+          The abscissa values (in index units) at which the parabola
+          fitted to each of the returned peaks realizes its width as
+          defined below.
+
+     This function accepts property-value pair given in the list below:
+
+     "MinPeakHeight"
+          Minimum peak height (non-negative scalar).  Only peaks that
+          exceed this value will be returned.  For data taking positive
+          and negative values use the option "DoubleSided".  Default
+          value ‘eps’.
+
+     "MinPeakDistance"
+          Minimum separation between (positive integer).  Peaks
+          separated by less than this distance are considered a single
+          peak.  This distance is also used to fit a second order
+          polynomial to the peaks to estimate their width, therefore it
+          acts as a smoothing parameter.  The neighborhood size is equal
+          to the value of "MinPeakDistance".  Default value 1.
+
+     "MinPeakWidth"
+          Minimum width of peaks (positive integer).  The width of the
+          peaks is estimated using a parabola fitted to the neighborhood
+          of each peak.  The width is caulculated with the formula
+          a * (width - x0)^2 = 1
+          where a is the the concavity of the parabola and x0 its
+          vertex.  Default value 1.
+
+     "MaxPeakWidth"
+          Maximum width of peaks (positive integer).  Default value
+          ‘Inf’.
+
+     "DoubleSided"
+          Tells the function that data takes positive and negative
+          values.  The base-line for the peaks is taken as the mean
+          value of the function.  This is equivalent as passing the
+          absolute value of the data after removing the mean.
+
+     Run ‘demo findpeaks’ to see some examples.
+
+3.2.2 peak2peak
+---------------
+
+ -- Function File: Y = peak2peak (X)
+ -- Function File: Y = peak2peak (X, DIM)
+     Compute the difference between the maximum and minimum values in
+     the vector X.
+
+     If X is a matrix, compute the difference for each column and return
+     them in a row vector.
+
+     If the optional argument DIM is given, operate along this
+     dimension.
+
+     See also: max, min, peak2rms, rms, rssq.
+
+3.2.3 peak2rms
+--------------
+
+ -- Function File: Y = peak2rms (X)
+ -- Function File: Y = peak2rms (X, DIM)
+     Compute the ratio of the largest absolute value to the
+     root-mean-square (RMS) value of the vector X.
+
+     If X is a matrix, compute the peak-magnitude-to-RMS ratio for each
+     column and return them in a row vector.
+
+     If the optional argument DIM is given, operate along this
+     dimension.
+
+     See also: max, min, peak2peak, rms, rssq.
+
+3.2.4 rms
+---------
+
+ -- Function File: Y = rms (X)
+ -- Function File: Y = rms (X, DIM)
+     Compute the root-mean-square (RMS) of the vector X.
+
+     The root-mean-square is defined as
+
+           rms (X) = SQRT (1/N SUM_i X(i)^2)
+
+     If X is a matrix, compute the root-mean-square for each column and
+     return them in a row vector.
+
+     If the optional argument DIM is given, operate along this
+     dimension.
+
+     See also: mean, meansq, peak2rms, rssq, sumsq.
+
+3.2.5 rssq
+----------
+
+ -- Function File: Y = rssq (X)
+ -- Function File: Y = rssq (X, DIM)
+     Compute the root-sum-of-squares (RSS) of the vector X.
+
+     The root-sum-of-squares is defined as
+
+           rssq (X) = SQRT (SUM_i X(i)^2)
+
+     If X is a matrix, compute the root-sum-of-squares for each column
+     and return them in a row vector.
+
+     If the optional argument DIM is given, operate along this
+     dimension.
+
+     See also: mean, meansq, sumsq, rms.
+
+
+File: signal.info,  Node: Correlation and Convolution,  Next: Filtering,  Prev: Signal Measurement,  Up: Function Reference
+
+3.3 Correlation and Convolution
+===============================
+
+3.3.1 cconv
+-----------
+
+ -- Function File: C = cconv (A, B, N)
+ -- Function File: C = cconv (A, B)
+     Compute the modulo-N circular convolution.
+
+     A and B are input vectors and C is the modolo-N convolution of A
+     and B.  If N is not provided, its assumed default value is
+     ‘length(A) + length(B) - 1’, which provides the same result as a
+     linear convolution.
+
+     Examples:
+
+           cconv (1:2, 1:4)
+              ⇒  1   4   7   10   8
+
+           cconv (1:2, 1:4, 2)
+              ⇒  16   14
+
+           cconv (1:2, 1:4, 4)
+              ⇒  9   4   7   10
+
+     See also: conv, circshift.
+
+3.3.2 convmtx
+-------------
+
+ -- Function File: convmtx (A, N)
+     If A is a column vector and X is a column vector of length N, then
+
+     ‘convmtx(A, N) * X’
+
+     gives the convolution of of A and X and is the same as ‘conv(A,
+     X)’.  The difference is if many vectors are to be convolved with
+     the same vector, then this technique is possibly faster.
+
+     Similarly, if A is a row vector and X is a row vector of length N,
+     then
+
+     ‘X * convmtx(A, N)’
+
+     is the same as ‘conv(X, A)’.
+
+See also: conv.
+
+3.3.3 wconv
+-----------
+
+ -- Function File: Y = wconv (TYPE, X, F)
+ -- Function File: Y = wconv (TYPE, X, F, SHAPE)
+     1-D or 2-D convolution.
+
+     *Inputs*
+     TYPE
+          Type of convolution.
+     X
+          Signal vector or matrix.
+     F
+          Coefficients of FIR filter.
+     SHAPE
+          Shape.
+
+     *Outputs*
+     Y
+          Convoluted signal.
+
+3.3.4 xcorr
+-----------
+
+ -- Function File: [R, LAG] = xcorr ( X )
+ -- Function File: ... = xcorr ( X, Y )
+ -- Function File: ... = xcorr ( ..., MAXLAG)
+ -- Function File: ... = xcorr ( ..., SCALE)
+     Estimates the cross-correlation.
+
+     Estimate the cross correlation R_xy(k) of vector arguments X and Y
+     or, if Y is omitted, estimate autocorrelation R_xx(k) of vector X,
+     for a range of lags k specified by argument "maxlag".  If X is a
+     matrix, each column of X is correlated with itself and every other
+     column.
+
+     The cross-correlation estimate between vectors "x" and "y" (of
+     length N) for lag "k" is given by
+
+                      N
+           R_xy(k) = sum x_{i+k} conj(y_i),
+                     i=1
+
+     where data not provided (for example x(-1), y(N+1)) is zero.  Note
+     the definition of cross-correlation given above.  To compute a
+     cross-correlation consistent with the field of statistics, see
+     ‘xcov’.
+
+     *ARGUMENTS*
+     X
+          [non-empty; real or complex; vector or matrix] data
+
+     Y
+          [real or complex vector] data
+
+          If X is a matrix (not a vector), Y must be omitted.  Y may be
+          omitted if X is a vector; in this case xcorr estimates the
+          autocorrelation of X.
+
+     MAXLAG
+          [integer scalar] maximum correlation lag If omitted, the
+          default value is N-1, where N is the greater of the lengths of
+          X and Y or, if X is a matrix, the number of rows in X.
+
+     SCALE
+          [character string] specifies the type of scaling applied to
+          the correlation vector (or matrix).  is one of:
+          ‘none’
+               return the unscaled correlation, R,
+          ‘biased’
+               return the biased average, R/N,
+          ‘unbiased’
+               return the unbiased average, R(k)/(N-|k|),
+          ‘coeff or normalized’
+               return the correlation coefficient, R/(rms(x).rms(y)),
+               where "k" is the lag, and "N" is the length of X.  If
+               omitted, the default value is "none".  If Y is supplied
+               but does not have the same length as X, scale must be
+               "none".
+
+     *RETURNED VARIABLES*
+     R
+          array of correlation estimates
+     LAG
+          row vector of correlation lags [-maxlag:maxlag]
+
+     The array of correlation estimates has one of the following forms:
+     (1) Cross-correlation estimate if X and Y are vectors.
+
+     (2) Autocorrelation estimate if is a vector and Y is omitted.
+
+     (3) If X is a matrix, R is an matrix containing the
+     cross-correlation estimate of each column with every other column.
+     Lag varies with the first index so that R has 2*maxlag+1 rows and
+     P^2 columns where P is the number of columns in X.
+
+     If Rij(k) is the correlation between columns i and j of X
+
+     ‘R(k+maxlag+1,P*(i-1)+j) == Rij(k)’
+
+     for lag k in [-maxlag:maxlag], or
+
+     ‘R(:,P*(i-1)+j) == xcorr(X(:,i),X(:,j))’.
+
+     ‘reshape(R(k,:),P,P)’ is the cross-correlation matrix for ‘X(k,:)’.
+
+     See also: xcov.
+
+3.3.5 xcorr2
+------------
+
+ -- Function File: xcorr2 (A)
+ -- Function File: xcorr2 (A, B)
+ -- Function File: xcorr2 (..., SCALE)
+     Compute the 2D cross-correlation of matrices A and B.
+
+     If B is not specified, computes autocorrelation of A, i.e., same as
+     ‘xcorr (A, A)’.
+
+     The optional argument SCALE, defines the type of scaling applied to
+     the cross-correlation matrix.  Possible values are:
+
+     "none" (default)
+          No scaling.
+
+     "biased"
+          Scales the raw cross-correlation by the maximum number of
+          elements of A and B involved in the generation of any element
+          of C.
+
+     "unbiased"
+          Scales the raw correlation by dividing each element in the
+          cross-correlation matrix by the number of products A and B
+          used to generate that element.
+
+     "coeff"
+          Scales the normalized cross-correlation on the range of [0 1]
+          so that a value of 1 corresponds to a correlation coefficient
+          of 1.
+
+     See also: conv2, corr2, xcorr.
+
+3.3.6 xcov
+----------
+
+ -- Function File: [R, LAG] = xcov ( X )
+ -- Function File: ... = xcov ( X, Y )
+ -- Function File: ... = xcov ( ..., MAXLAG)
+ -- Function File: ... = xcov ( ..., SCALE)
+     Compute covariance at various lags
+     [=correlation(x-mean(x),y-mean(y))].
+
+     X
+          input vector
+     Y
+          if specified, compute cross-covariance between X and Y,
+          otherwise compute autocovariance of X.
+     MAXLAG
+          is specified, use lag range [-maxlag:maxlag], otherwise use
+          range [-n+1:n-1].
+     SCALE:
+          ‘biased’
+               for covariance=raw/N,
+          ‘unbiased’
+               for covariance=raw/(N-|lag|),
+          ‘coeff’
+               for covariance=raw/(covariance at lag 0),
+          ‘none’
+               for covariance=raw
+          ‘none’
+               is the default.
+
+     Returns the covariance for each lag in the range, plus an optional
+     vector of lags.
+
+     See also: xcorr.
+
+
+File: signal.info,  Node: Filtering,  Next: Filter Analysis,  Prev: Correlation and Convolution,  Up: Function Reference
+
+3.4 Filtering
+=============
+
+3.4.1 filtfilt
+--------------
+
+ -- Function File: Y = filtfilt (B, A, X)
+
+     Forward and reverse filter the signal.  This corrects for phase
+     distortion introduced by a one-pass filter, though it does square
+     the magnitude response in the process.  That’s the theory at least.
+     In practice the phase correction is not perfect, and magnitude
+     response is distorted, particularly in the stop band.
+
+     Example
+           [b, a]=butter(3, 0.1);                  # 5 Hz low-pass filter
+           t = 0:0.01:1.0;                         # 1 second sample
+           x=sin(2*pi*t*2.3)+0.25*randn(size(t));  # 2.3 Hz sinusoid+noise
+           y = filtfilt(b,a,x); z = filter(b,a,x); # apply filter
+           plot(t,x,';data;',t,y,';filtfilt;',t,z,';filter;')
+
+3.4.2 filtic
+------------
+
+ -- Function File: ZF = filtic (B, A, Y)
+ -- Function File: ZF = filtic (B, A, Y, X)
+
+     Set initial condition vector for filter function The vector zf has
+     the same values that would be obtained from function filter given
+     past inputs x and outputs y
+
+     The vectors x and y contain the most recent inputs and outputs
+     respectively, with the newest values first:
+
+     x = [x(-1) x(-2) ...  x(-nb)], nb = length(b)-1 y = [y(-1) y(-2)
+     ...  y(-na)], na = length(a)-a
+
+     If length(x)<nb then it is zero padded If length(y)<na then it is
+     zero padded
+
+     zf = filtic(b, a, y) Initial conditions for filter with
+     coefficients a and b and output vector y, assuming input vector x
+     is zero
+
+     zf = filtic(b, a, y, x) Initial conditions for filter with
+     coefficients a and b input vector x and output vector y
+
+3.4.3 medfilt1
+--------------
+
+ -- : Y = medfilt1 (X, N)
+ -- : Y = medfilt1 (X, N, [], DIM)
+ -- : Y = medfilt1 (..., NAN_FLAG, PADDING)
+
+     Apply a one dimensional median filter with a window size of N to
+     the data X, which must be real, double and full.  For N = 2m+1,
+     Y(i) is the median of X(i-m:i+m).  For N = 2m, Y(i) is the median
+     of X(i-m:i+m-1).
+
+     The calculation is performed over the first non-singleton
+     dimension, or over dimension DIM if that is specified as the fourth
+     argument.  (The third argument is ignored; Matlab used to use it to
+     tune its algorithm.)
+
+     NAN_FLAG may be omitnan or includenan (the default).  If it is
+     omitnan then any NaN values are removed from the window before the
+     median is taken.  Otherwise, any window containing an NaN returns a
+     median of NaN.
+
+     PADDING determines how the partial windows at the start and end of
+     X are treated.  It may be truncate or zeropad (the default).  If it
+     is truncate then the window for Y(i) is the intersection of the
+     window stated above with 1:length(X).  If it is zeropad, then
+     partial windows have additional zeros to bring them up to size N.
+
+     See also: filter, medfilt2.
+
+3.4.4 movingrms
+---------------
+
+ -- Function File: [RMSX,W] = movingrms (X,W,RC,FS=1)
+     Calculate moving RMS value of the signal in X.
+
+     The signal is convoluted against a sigmoid window of width W and
+     risetime RC.  The units of these parameters are relative to the
+     value of the sampling frequency given in FS (Default value = 1).
+
+     Run ‘demo movingrms’ to see an example.
+
+     See also: sigmoid_train.
+
+3.4.5 sgolayfilt
+----------------
+
+ -- Function File: Y = sgolayfilt (X)
+ -- Function File: Y = sgolayfilt (X, P)
+ -- Function File: Y = sgolayfilt (X, P, N)
+ -- Function File: Y = sgolayfilt (X, P, N, M)
+ -- Function File: Y = sgolayfilt (X, P, N, M, TS)
+ -- Function File: Y = sgolayfilt (X, P, N, M, TS)
+ -- Function File: Y = sgolayfilt (X, F)
+     Smooth the data in x with a Savitsky-Golay smoothing filter of
+     polynomial order p and length n, n odd, n > p.  By default, p=3 and
+     n=p+2 or n=p+3 if p is even.
+
+     If F is given as a matrix, it is expected to be a filter as
+     computed by ‘sgolay’.
+
+     These filters are particularly good at preserving lineshape while
+     removing high frequency squiggles.  Particularly, compare a 5
+     sample averager, an order 5 butterworth lowpass filter (cutoff 1/3)
+     and sgolayfilt(x, 3, 5), the best cubic estimated from 5 points:
+
+           [b, a] = butter (5, 1/3);
+           x = [zeros(1,15), 10*ones(1,10), zeros(1,15)];
+           plot (sgolayfilt (x), "r;sgolayfilt;", ...
+                 filtfilt (ones (1,5)/5, 1, x), "g;5 sample average;", ...
+                 filtfilt (b, a, x), "c;order 5 butterworth;", ...
+                 x, "+b;original data;");
+
+     See also: sgolay.
+
+3.4.6 sosfilt
+-------------
+
+ -- Loadable Function: Y = sosfilt (SOS, X)
+     Second order section IIR filtering of X.  The second order section
+     filter is described by the matrix SOS with:
+
+             [ B1 A1 ]
+     SOS =   [ ... ],
+             [ BN AN ]
+
+     where ‘B1 = [b0 b1 b2]’ and ‘A1 = [1 a1 a2]’ for section 1, etc.
+     The b0 entry must be nonzero for each section.
+
+
+File: signal.info,  Node: Filter Analysis,  Next: Filter Conversion,  Prev: Filtering,  Up: Function Reference
+
+3.5 Filter Analysis
+===================
+
+3.5.1 filternorm
+----------------
+
+ -- Function File: L = filternorm (B, A)
+ -- Function File: L = filternorm (B, A, PNORM)
+ -- Function File: L = filternorm (B, A, 2, TOL)
+
+     Compute the 2-norm of a digital filter defined by the numerator
+     coefficients, B, and the denominator coefficients, A.  It is also
+     possible to compute the infinity-norm by passing inf in the PNORM
+     parameter.  PNORM only accepts 2 or inf.
+
+     Example:
+           [b, a] = butter (8, 0.5);
+           filternorm (b, a)
+
+3.5.2 filtord
+-------------
+
+ -- Function File: N = filtord (B, A)
+ -- Function File: N = filtord (SOS)
+
+     Returns the filter order N for a filter defined by the numerator
+     coefficients, B, and the denominator coefficients, A.  It also
+     accepts a filter defined by a matrix of second-order sections, SOS.
+
+     Example:
+           [b, a] = butter (8, 0.5);
+           filtord (b, a)
+
+3.5.3 freqs
+-----------
+
+ -- Function File: H = freqs (B, A, W)
+ -- Function File: freqs (B, A, W)
+
+     Compute the s-plane frequency response of the IIR filter B(s)/A(s)
+     as H = polyval(B,j*W)./polyval(A,j*W). If called with no output
+     argument, a plot of magnitude and phase are displayed.
+
+     Example:
+           b = [1 2]; a = [1 1];
+           w = linspace (0, 4, 128);
+           freqs (b, a, w);
+
+3.5.4 freqs_plot
+----------------
+
+ -- Function File: freqs_plot (W, H)
+     Plot the amplitude and phase of the vector H.
+
+3.5.5 fwhm
+----------
+
+ -- Function File: F = fwhm (Y)
+ -- Function File: F = fwhm (X, Y)
+ -- Function File: F = fwhm (..., "zero")
+ -- Function File: F = fwhm (..., "min")
+ -- Function File: F = fwhm (..., "alevel", LEVEL)
+ -- Function File: F = fwhm (..., "rlevel", LEVEL)
+
+     Compute peak full-width at half maximum (FWHM) or at another level
+     of peak maximum for vector or matrix data Y, optionally sampled as
+     y(x).  If Y is a matrix, return FWHM for each column as a row
+     vector.
+
+     The default option "zero" computes fwhm at half maximum, i.e.
+     0.5*max(y).  The option "min" computes fwhm at the middle curve,
+     i.e.  0.5*(min(y)+max(y)).
+
+     The option "rlevel" computes full-width at the given relative level
+     of peak profile, i.e.  at rlevel*max(y) or rlevel*(min(y)+max(y)),
+     respectively.  For example, ‘fwhm (..., "rlevel", 0.1)’ computes
+     full width at 10 % of peak maximum with respect to zero or minimum;
+     FWHM is equivalent to ‘fwhm(..., "rlevel", 0.5)’.
+
+     The option "alevel" computes full-width at the given absolute level
+     of Y.
+
+     Return 0 if FWHM does not exist (e.g.  monotonous function or the
+     function does not cut horizontal line at rlevel*max(y) or
+     rlevel*(max(y)+min(y)) or alevel, respectively).
+
+3.5.6 grpdelay
+--------------
+
+ -- Function File: [G, W] = grpdelay (B)
+ -- Function File: [G, W] = grpdelay (B, A)
+ -- Function File: [G, W] = grpdelay (..., N)
+ -- Function File: [G, W] = grpdelay (..., N, "whole")
+ -- Function File: [G, F] = grpdelay (..., N, FS)
+ -- Function File: [G, F] = grpdelay (..., N, "whole", FS)
+ -- Function File: [G, W] = grpdelay (..., W)
+ -- Function File: [G, F] = grpdelay (..., F, FS)
+ -- Function File: grpdelay (...)
+     Compute the group delay of a filter.
+
+     [g, w] = grpdelay(b) returns the group delay g of the FIR filter
+     with coefficients b.  The response is evaluated at 512 angular
+     frequencies between 0 and pi.  w is a vector containing the 512
+     frequencies.  The group delay is in units of samples.  It can be
+     converted to seconds by multiplying by the sampling period (or
+     dividing by the sampling rate fs).
+
+     [g, w] = grpdelay(b,a) returns the group delay of the rational IIR
+     filter whose numerator has coefficients b and denominator
+     coefficients a.
+
+     [g, w] = grpdelay(b,a,n) returns the group delay evaluated at n
+     angular frequencies.  For fastest computation n should factor into
+     a small number of small primes.
+
+     [g, w] = grpdelay(b,a,n,’whole’) evaluates the group delay at n
+     frequencies between 0 and 2*pi.
+
+     [g, f] = grpdelay(b,a,n,Fs) evaluates the group delay at n
+     frequencies between 0 and Fs/2.
+
+     [g, f] = grpdelay(b,a,n,’whole’,Fs) evaluates the group delay at n
+     frequencies between 0 and Fs.
+
+     [g, w] = grpdelay(b,a,w) evaluates the group delay at frequencies w
+     (radians per sample).
+
+     [g, f] = grpdelay(b,a,f,Fs) evaluates the group delay at
+     frequencies f (in Hz).
+
+     grpdelay(...)  plots the group delay vs.  frequency.
+
+     If the denominator of the computation becomes too small, the group
+     delay is set to zero.  (The group delay approaches infinity when
+     there are poles or zeros very close to the unit circle in the z
+     plane.)
+
+     Theory: group delay, g(w) = -d/dw [arg{H(e^jw)}], is the rate of
+     change of phase with respect to frequency.  It can be computed as:
+
+                         d/dw H(e^-jw)
+                  g(w) = -------------
+                           H(e^-jw)
+
+     where
+
+                   H(z) = B(z)/A(z) = sum(b_k z^k)/sum(a_k z^k).
+
+     By the quotient rule,
+
+                              A(z) d/dw B(z) - B(z) d/dw A(z)
+                  d/dw H(z) = -------------------------------
+                                         A(z) A(z)
+
+     Substituting into the expression above yields:
+
+                          A dB - B dA
+                  g(w) =  ----------- = dB/B - dA/A
+                              A B
+
+     Note that,
+
+                  d/dw B(e^-jw) = sum(k b_k e^-jwk)
+                  d/dw A(e^-jw) = sum(k a_k e^-jwk)
+
+     which is just the FFT of the coefficients multiplied by a ramp.
+
+     As a further optimization when nfft>>length(a), the IIR filter
+     (b,a) is converted to the FIR filter conv(b,fliplr(conj(a))).  For
+     further details, see
+     http://ccrma.stanford.edu/~jos/filters/Numerical_Computation_Group_Delay.html
+
+3.5.7 impz
+----------
+
+ -- Function File: [X, T] = impz (B)
+ -- Function File: [X, T] = impz (B, A)
+ -- Function File: [X, T] = impz (B, A, N)
+ -- Function File: [X, T] = impz (B, A, N, FS)
+ -- Function File: impz (...)
+
+     Generate impulse-response characteristics of the filter.  The
+     filter coefficients correspond to the the z-plane rational function
+     with numerator b and denominator a.  If a is not specified, it
+     defaults to 1.  If n is not specified, or specified as [], it will
+     be chosen such that the signal has a chance to die down to -120dB,
+     or to not explode beyond 120dB, or to show five periods if there is
+     no significant damping.  If no return arguments are requested, plot
+     the results.
+
+     See also: freqz, zplane.
+
+3.5.8 isallpass
+---------------
+
+ -- Function File: L = isallpass (B, A)
+ -- Function File: L = isallpass (SOS)
+
+     Determine whether a digital filter is allpass.  The filter might be
+     defined by the numerator coefficients, B, and the denominator
+     coefficients, A, or, alternatively, by a matrix of second-order
+     sections, SOS.
+
+     Example:
+           a = [1 2 3];
+           b = [3 2 1];
+           isallpass (b, a)
+
+     Ref [1] Shyu, Jong-Jy, & Pei, Soo-Chang, A new approach to the
+     design of complex all-pass IIR digital filters, Signal Processing,
+     40(2–3), 207–215, 1994.
+     https://doi.org/10.1016/0165-1684(94)90068-x
+
+     Ref [2] Vaidyanathan, P. P. Multirate Systems and Filter Banks.
+     1st edition, Pearson College Div, 1992.
+
+3.5.9 ismaxphase
+----------------
+
+ -- Function File: L = ismaxphase (B, A)
+ -- Function File: L = ismaxphase (SOS)
+ -- Function File: L = ismaxphase (..., TOL)
+
+     Determine whether a digital filter is maximum phase (maximum
+     energy-delay).  The filter might be defined by the numerator
+     coefficients, B, and the denominator coefficients, A, or,
+     alternatively, by a matrix of second-order sections, SOS.  A
+     tolerance TOL might be given to define when two numbers are close
+     enough to be considered equal.
+
+     Example:
+           b = [1 2 4 4 2 1];
+           zplane (b);
+           ismaxphase (b)
+
+     Ref [1] Oppenheim, Alan, and Ronald Schafer.  Discrete-Time Signal
+     Processing.  3rd edition, Pearson, 2009.
+
+3.5.10 isminphase
+-----------------
+
+ -- Function File: L = isminphase (B, A)
+ -- Function File: L = isminphase (SOS)
+ -- Function File: L = isminphase (..., TOL)
+
+     Determine whether a digital filter is minimum phase.  The filter
+     might be defined by the numerator coefficients, B, and the
+     denominator coefficients, A, or, alternatively, by a matrix of
+     second-order sections, SOS.  A toleranve TOL might be given to
+     define when two numbers are close enough to be considered equal.
+
+     Example:
+           a = [1 0.5]; b = [3 1];
+           isminphase (b, a)
+
+     Ref [1] Oppenheim, Alan, and Ronald Schafer.  Discrete-Time Signal
+     Processing.  3rd edition, Pearson, 2009.
+
+3.5.11 isstable
+---------------
+
+ -- Function File: FLAG = isstable (B, A)
+     Returns a logical output equal to TRUE, if the filter is stable.
+     This can be done with coeffients of the filer B and A.
+     Alternatively by using a second order sections matrix (SOS).
+
+     Inputs:
+        • B: Numerator coefficients of the filter
+
+        • A: Denominator coeffients of the filter.  Can be an empty
+          vector.
+
+     Output:
+        • FLAG: Returns a logical output, equal to TRUE if the filter is
+          stable.
+
+     Examples:
+             b = [1 2 3 4 5 5 1 2];
+             a = [4 5 6 7 9 10 4 6];
+             flag = isstable (b, a)
+             flag = 0
+
+     Using SOS
+             [z, p, k] = butter (6, 0.7, 'high');
+             sos = zp2sos (z, p, k);
+             flag = isstable (sos)
+             flag = 1
+
+3.5.12 phasez
+-------------
+
+ -- Function File: [PHI, W] = phasez (B, A, N)
+ -- Function File: [PHI, W] = phasez (B, A)
+ -- Function File: [PHI, W] = phasez (SOS, N)
+ -- Function File: [PHI, W] = phasez (SOS)
+ -- Function File: [PHI, W] = phasez (..., N, "whole")
+ -- Function File: [PHI, W] = phasez (..., N, Fs)
+ -- Function File: phasez (...)
+
+     Compute the phase response of digital filter defined either by its
+     coefficients (B and A are the numerator and denominator
+     coefficients respectively) or by its second-order sections
+     representation, given by the matrix SOS.  The output PHI is the
+     phase response computed in a vector the vector of frequencies W.
+
+     The phase response is evaluated at N angular frequencies between 0
+     and pi.
+
+     If A is omitted, the denominator is assumed to be 1 (this
+     corresponds to a simple FIR filter).
+
+     If N is omitted, a value of 512 is assumed.
+
+     If the third/forth argument, "whole", is given, the response is
+     evaluated at N angular frequencies between 0 and 2*pi.  It is
+     possible also to pass the value "half", which will lead to the
+     default behaviour.
+
+     Example:
+           [b, a] = butter (2, [.15,.3]);
+           phasez (b, a);
+
+     Ref [1] Oppenheim, Alan, and Ronald Schafer.  Discrete-Time Signal
+     Processing.  3rd edition, Pearson, 2009.
+
+     See also: freqz, phasedelay.
+
+3.5.13 zplane
+-------------
+
+ -- Function File: zplane (Z, P)
+ -- Function File: zplane (B, A)
+     Plot the poles and zeros on a complex plane.  If the arguments are
+     column vectors Z and P, the complex zeros Z and poles P are
+     displayed.  If the arguments are row vectors B and A, the zeros and
+     poles of the transfer function represented by these filter
+     coefficients are displayed.
+
+     If Z and P are matrices, the columns are distinct sets of zeros and
+     poles and are displayed together in distinct colors.
+
+     Note that due to the nature of the ‘roots’ function, poles and
+     zeros may be displayed as occurring around a circle rather than at
+     a single point.
+
+     The transfer function is
+
+                  B(z)   b0 + b1 z^(-1) + b2 z^(-2) + ... + bM z^(-M)
+           H(z) = ---- = --------------------------------------------
+                  A(z)   a0 + a1 z^(-1) + a2 z^(-2) + ... + aN z^(-N)
+
+                         b0          (z - z1) (z - z2) ... (z - zM)
+                       = -- z^(-M+N) ------------------------------
+                         a0          (z - p1) (z - p2) ... (z - pN)
+
+     If called with only one argument, the poles P defaults to an empty
+     vector, and the denominator coefficient vector A defaults to 1.
+
+
+File: signal.info,  Node: Filter Conversion,  Next: IIR Filter Design,  Prev: Filter Analysis,  Up: Function Reference
+
+3.6 Filter Conversion
+=====================
+
+3.6.1 residued
+--------------
+
+ -- Function File: [R, P, F, M] = residued (B, A)
+     Compute the partial fraction expansion (PFE) of filter H(z) =
+     B(z)/A(z).  In the usual PFE function ‘residuez’, the IIR part
+     (poles P and residues R) is driven _in parallel_ with the FIR part
+     (F).  In this variant, the IIR part is driven by the _output_ of
+     the FIR part.  This structure can be more accurate in signal
+     modeling applications.
+
+     INPUTS: B and A are vectors specifying the digital filter H(z) =
+     B(z)/A(z).  See ‘help filter’ for documentation of the B and A
+     filter coefficients.
+
+     RETURNED:
+        • R = column vector containing the filter-pole residues
+        • P = column vector containing the filter poles
+        • F = row vector containing the FIR part, if any
+        • M = column vector of pole multiplicities
+
+     EXAMPLES:
+           See test residued verbose to see a number of examples.
+
+     For the theory of operation, see
+     ‘http://ccrma.stanford.edu/~jos/filters/residued.html’
+
+     See also: residue, residued.
+
+3.6.2 residuez
+--------------
+
+ -- Function File: [R, P, F, M] = residuez (B, A)
+     Compute the partial fraction expansion of filter H(z) = B(z)/A(z).
+
+     INPUTS: B and A are vectors specifying the digital filter H(z) =
+     B(z)/A(z).  See ‘help filter’ for documentation of the B and A
+     filter coefficients.
+
+     RETURNED:
+        • R = column vector containing the filter-pole residues
+        • P = column vector containing the filter poles
+        • F = row vector containing the FIR part, if any
+        • M = column vector of pole multiplicities
+
+     EXAMPLES:
+           See test residuez verbose to see a number of examples.
+
+     For the theory of operation, see
+     ‘http://ccrma.stanford.edu/~jos/filters/residuez.html’
+
+     See also: residue, residued.
+
+3.6.3 sos2ss
+------------
+
+ -- Function File: [A, B, C, D] = sos2ss (SOS)
+     Convert series second-order sections to state-space.
+
+     See also: sos2ss, ss2tf.
+
+3.6.4 sos2tf
+------------
+
+ -- Function File: [B, A] = sos2tf (SOS)
+ -- Function File: [B, A] = sos2tf (SOS, G)
+     Convert series second-order sections to transfer function.
+
+     INPUTS:
+
+        • SOS = matrix of series second-order sections, one per row:
+               SOS = [B1.' A1.'; ...; BN.' AN.']
+          where ‘B1.' = [b0 b1 b2] and A1.' = [a0 a1 a2]’ for section 1,
+          etc.
+
+          a0 is usually equal to 1 because all 2nd order transfer
+          functions can be scaled so that a0 = 1.  However, this is not
+          mandatory for this implementation, which supports all kinds of
+          transfer functions, including first order transfer functions.
+          See ‘filter’ for documentation of the second-order direct-form
+          filter coefficients Bi and Ai.
+
+        • G is an overall gain factor that effectively scales the output
+          B vector (or any one of the input Bi vectors).  If not given
+          the gain is assumed to be 1.
+
+     RETURNED: B and A are vectors specifying the analog or digital
+     filter H(s) = B(s)/A(s) or H(z) = B(z)/A(z).  See ‘filter’ for
+     further details.
+
+     See also: tf2sos, zp2sos, sos2pz, zp2tf, tf2zp.
+
+3.6.5 sos2zp
+------------
+
+ -- Function File: [Z, P, K] = sos2zp (SOS)
+ -- Function File: [Z, P, K] = sos2zp (SOS, G)
+     Convert series second-order sections to zeros, poles, and gains
+     (pole residues).
+
+     INPUTS:
+
+        • SOS = matrix of series second-order sections, one per row:
+               SOS = [B1.' A1.'; ...; BN.' AN.']
+          where ‘B1.' = [b0 b1 b2] and A1.' = [a0 a1 a2]’ for section 1,
+          etc.
+
+          a0 is usually equal to 1 because all 2nd order transfer
+          functions can be scaled so that a0 = 1.  However, this is not
+          mandatory for this implementation, which supports all kinds of
+          transfer functions, including first order transfer functions.
+          See ‘filter’ for documentation of the second-order direct-form
+          filter coefficients Bi and Ai.
+
+        • G is an overall gain factor that effectively scales any one of
+          the input Bi vectors.  If not given the gain is assumed to be
+          1.
+
+     RETURNED:
+        • Z = column-vector containing all zeros (roots of B(z))
+        • P = column-vector containing all poles (roots of A(z))
+        • K = overall gain = B(Inf)
+
+     EXAMPLE:
+           [z, p, k] = sos2zp ([1 0 1, 1 0 -0.81; 1 0 0, 1 0 0.49])
+             ⇒ z =
+                0 + 1i
+                0 - 1i
+                0 + 0i
+                0 + 0i
+             ⇒ p =
+               -0.9000 + 0i
+                0.9000 + 0i
+                0 + 0.7000i
+                0 - 0.7000i
+             ⇒ k =  1
+
+     See also: zp2sos, sos2tf, tf2sos, zp2tf, tf2zp.
+
+3.6.6 ss2tf
+-----------
+
+ -- Function File: [NUM, DEN] = ss2tf (A, B, C, D)
+     Conversion from state-space to transfer function representation.
+     The state space system:
+                 .
+                 x = Ax + Bu
+                 y = Cx + Du
+
+     is converted to a transfer function:
+                           num(s)
+                     G(s)=-------
+                           den(s)
+
+3.6.7 ss2zp
+-----------
+
+ -- Function File: [Z, P, K] = ss2zp (A, B, C, D)
+     Converts a state space representation to a set of poles and zeros;
+     K is a gain associated with the zeros.
+
+3.6.8 tf2sos
+------------
+
+ -- Function File: [SOS, G] = tf2sos (B, A)
+ -- Function File: SOS = tf2sos (B, A)
+     Convert direct-form filter coefficients to series second-order
+     sections.
+
+     INPUTS:
+
+     B and A are vectors specifying the digital filter H(z) = B(z)/A(z).
+     See ‘filter’ for documentation of the B and A filter coefficients.
+
+     RETURNED:
+        • SOS = matrix of series second-order sections, one per row:
+               SOS = [B1.' A1.'; ...; BN.' AN.']
+          where ‘B1.' = [b0 b1 b2] and A1.' = [1 a1 a2]’ for section 1,
+          etc.  The b0 entry must be nonzero for each section (zeros at
+          infinity not supported).
+        • G is an overall gain factor that effectively scales any one of
+          the Bi vectors.
+
+     If called with only one output argument, the overall filter gain is
+     applied to the first second-order section in the matrix SOS.
+
+     EXAMPLE:
+           B = [1 0 0 0 0 1];
+           A = [1 0 0 0 0 .9];
+           [sos, g] = tf2sos (B, A)
+
+           sos =
+
+              1.00000   0.61803   1.00000   1.00000   0.60515   0.95873
+              1.00000  -1.61803   1.00000   1.00000  -1.58430   0.95873
+              1.00000   1.00000  -0.00000   1.00000   0.97915  -0.00000
+
+           g = 1
+
+     See also: sos2tf, zp2sos, sos2pz, zp2tf, tf2zp.
+
+3.6.9 tf2ss
+-----------
+
+ -- Function File: [A, B, C, D] = tf2ss (NUM, DEN)
+     Conversion from transfer function to state-space.  The state space
+     system:
+                 .
+                 x = Ax + Bu
+                 y = Cx + Du
+     is obtained from a transfer function:
+                           num(s)
+                     G(s)=-------
+                           den(s)
+
+     The state space system matrices obtained from this function will be
+     in observable companion form as Wolovich’s Observable Structure
+     Theorem is used.
+
+3.6.10 tf2zp
+------------
+
+ -- Function File: [Z, P, K] = tf2zp (NUM, DEN)
+     Convert transfer functions to poles-and-zero representations.
+
+     Returns the zeros and poles of the system defined by NUM/DEN.  K is
+     a gain associated with the system zeros.
+
+3.6.11 zp2sos
+-------------
+
+ -- Function File: [SOS, G] = zp2sos (Z)
+ -- Function File: [SOS, G] = zp2sos (Z, P)
+ -- Function File: [SOS, G] = zp2sos (Z, P, K)
+ -- Function File: SOS = zp2sos (...)
+     Convert filter poles and zeros to second-order sections.
+
+     INPUTS:
+        • Z = column-vector containing the filter zeros
+        • P = column-vector containing the filter poles
+        • K = overall filter gain factor.  If not given the gain is
+          assumed to be 1.
+
+     RETURNED:
+        • SOS = matrix of series second-order sections, one per row:
+               SOS = [B1.' A1.'; ...; BN.' AN.']
+          where ‘B1.' = [b0 b1 b2] and A1.' = [a0 a1 a2]’ for section 1,
+          etc.  See ‘filter’ for documentation of the second-order
+          direct-form filter coefficients Bi and %Ai, i=1:N.
+
+        • G is the overall gain factor that effectively scales any one
+          of the Bi vectors.
+
+     If called with only one output argument, the overall filter gain is
+     applied to the first second-order section in the matrix SOS.
+
+     EXAMPLE:
+             [z, p, k] = tf2zp ([1 0 0 0 0 1], [1 0 0 0 0 .9]);
+             [sos, g] = zp2sos (z, p, k)
+
+           sos =
+              1.0000    0.6180    1.0000    1.0000    0.6051    0.9587
+              1.0000   -1.6180    1.0000    1.0000   -1.5843    0.9587
+              1.0000    1.0000         0    1.0000    0.9791         0
+
+           g =
+               1
+
+     See also: sos2zp, sos2tf, tf2sos, zp2tf, tf2zp.
+
+3.6.12 zp2ss
+------------
+
+ -- Function File: [A, B, C, D] = zp2ss (Z, P, K)
+     Conversion from zero / pole to state space.
+
+     *Inputs*
+     Z
+     P
+          Vectors of (possibly) complex poles and zeros of a transfer
+          function.  Complex values must come in conjugate pairs (i.e.,
+          x+jy in Z means that x-jy is also in Z).
+     K
+          Real scalar (leading coefficient).
+
+     *Outputs*
+     A
+     B
+     C
+     D
+          The state space system, in the form:
+                     .
+                     x = Ax + Bu
+                     y = Cx + Du
+
+3.6.13 zp2tf
+------------
+
+ -- Function File: [NUM, DEN] = zp2tf (Z, P, K)
+     Converts zeros / poles to a transfer function.
+
+     *Inputs*
+     Z
+     P
+          Vectors of (possibly complex) poles and zeros of a transfer
+          function.  Complex values must appear in conjugate pairs.
+     K
+          Real scalar (leading coefficient).
+
+
+File: signal.info,  Node: IIR Filter Design,  Next: FIR Filter Design,  Prev: Filter Conversion,  Up: Function Reference
+
+3.7 IIR Filter Design
+=====================
+
+3.7.1 besselap
+--------------
+
+ -- Function File: [ZERO, POLE, GAIN] = besselap (N)
+     Return bessel analog filter prototype.
+
+     References:
+
+     http://en.wikipedia.org/wiki/Bessel_polynomials
+
+3.7.2 besself
+-------------
+
+ -- Function File: [B, A] = besself (N, W)
+ -- Function File: [B, A] = besself (N, W, "high")
+ -- Function File: [Z, P, G] = besself (...)
+ -- Function File: [A, B, C, D] = besself (...)
+ -- Function File: [...] = besself (..., "z")
+     Generate a Bessel filter.  Default is a Laplace space (s) filter.
+
+     [b,a] = besself(n, Wc) low pass filter with cutoff pi*Wc radians
+
+     [b,a] = besself(n, Wc, ’high’) high pass filter with cutoff pi*Wc
+     radians
+
+     [z,p,g] = besself(...)  return filter as zero-pole-gain rather than
+     coefficients of the numerator and denominator polynomials.
+
+     [...]  = besself(...,’z’) return a discrete space (Z) filter, W
+     must be less than 1.
+
+     [a,b,c,d] = besself(...)  return state-space matrices
+
+     References:
+
+     Proakis & Manolakis (1992).  Digital Signal Processing.  New York:
+     Macmillan Publishing Company.
+
+3.7.3 bilinear
+--------------
+
+ -- Function File: [ZB, ZA] = bilinear (SB, SA, T)
+ -- Function File: [ZB, ZA] = bilinear (SZ, SP, SG, T)
+ -- Function File: [ZZ, ZP, ZG] = bilinear (...)
+     Transform a s-plane filter specification into a z-plane
+     specification.  Filters can be specified in either zero-pole-gain
+     or transfer function form.  The input form does not have to match
+     the output form.  1/T is the sampling frequency represented in the
+     z plane.
+
+     Note: this differs from the bilinear function in the signal
+     processing toolbox, which uses 1/T rather than T.
+
+     Theory: Given a piecewise flat filter design, you can transform it
+     from the s-plane to the z-plane while maintaining the band edges by
+     means of the bilinear transform.  This maps the left hand side of
+     the s-plane into the interior of the unit circle.  The mapping is
+     highly non-linear, so you must design your filter with band edges
+     in the s-plane positioned at 2/T tan(w*T/2) so that they will be
+     positioned at w after the bilinear transform is complete.
+
+     The following table summarizes the transformation:
+
+           +---------------+-----------------------+----------------------+
+           | Transform     | Zero at x             | Pole at x            |
+           |    H(S)       |   H(S) = S-x          |    H(S)=1/(S-x)      |
+           +---------------+-----------------------+----------------------+
+           |       2 z-1   | zero: (2+xT)/(2-xT)   | zero: -1             |
+           |  S -> - ---   | pole: -1              | pole: (2+xT)/(2-xT)  |
+           |       T z+1   | gain: (2-xT)/T        | gain: (2-xT)/T       |
+           +---------------+-----------------------+----------------------+
+
+     With tedious algebra, you can derive the above formulae yourself by
+     substituting the transform for S into H(S)=S-x for a zero at x or
+     H(S)=1/(S-x) for a pole at x, and converting the result into the
+     form:
+
+              H(Z)=g prod(Z-Xi)/prod(Z-Xj)
+
+     Please note that a pole and a zero at the same place exactly
+     cancel.  This is significant since the bilinear transform creates
+     numerous extra poles and zeros, most of which cancel.  Those which
+     do not cancel have a "fill-in" effect, extending the shorter of the
+     sets to have the same number of as the longer of the sets of poles
+     and zeros (or at least split the difference in the case of the band
+     pass filter).  There may be other opportunistic cancellations but I
+     will not check for them.
+
+     Also note that any pole on the unit circle or beyond will result in
+     an unstable filter.  Because of cancellation, this will only happen
+     if the number of poles is smaller than the number of zeros.  The
+     analytic design methods all yield more poles than zeros, so this
+     will not be a problem.
+
+     References:
+
+     Proakis & Manolakis (1992).  Digital Signal Processing.  New York:
+     Macmillan Publishing Company.
+
+3.7.4 buttap
+------------
+
+ -- Function File: [Z, P, G] = buttap (N)
+     Design lowpass analog Butterworth filter.
+
+     This function exists for MATLAB compatibility only, and is
+     equivalent to ‘butter (N, 1, "s")’.
+
+     See also: butter.
+
+3.7.5 butter
+------------
+
+ -- Function File: [B, A] = butter (N, WC)
+ -- Function File: [B, A] = butter (N, WC, FILTER_TYPE)
+ -- Function File: [Z, P, G] = butter (...)
+ -- Function File: [A, B, C, D] = butter (...)
+ -- Function File: [...] = butter (..., "s")
+     Generate a Butterworth filter.  Default is a discrete space (Z)
+     filter.
+
+     The cutoff frequency, WC should be specified in radians for analog
+     filters.  For digital filters, it must be a value between zero and
+     one.  For bandpass filters, WC is a two-element vector with ‘w(1) <
+     w(2)’.
+
+     The filter type must be one of "low", "high", "bandpass", or
+     "stop".  The default is "low" if WC is a scalar and "bandpass" if
+     WC is a two-element vector.
+
+     If the final input argument is "s" design an analog Laplace space
+     filter.
+
+     Low pass filter with cutoff ‘pi*Wc’ radians:
+
+           [b, a] = butter (n, Wc)
+
+     High pass filter with cutoff ‘pi*Wc’ radians:
+
+           [b, a] = butter (n, Wc, "high")
+
+     Band pass filter with edges ‘pi*Wl’ and ‘pi*Wh’ radians:
+
+           [b, a] = butter (n, [Wl, Wh])
+
+     Band reject filter with edges ‘pi*Wl’ and ‘pi*Wh’ radians:
+
+           [b, a] = butter (n, [Wl, Wh], "stop")
+
+     Return filter as zero-pole-gain rather than coefficients of the
+     numerator and denominator polynomials:
+
+           [z, p, g] = butter (...)
+
+     Return a Laplace space filter, WC can be larger than 1:
+
+           [...] = butter (..., "s")
+
+     Return state-space matrices:
+
+           [a, b, c, d] = butter (...)
+
+     References:
+
+     Proakis & Manolakis (1992).  Digital Signal Processing.  New York:
+     Macmillan Publishing Company.
+
+3.7.6 buttord
+-------------
+
+ -- Function File: N = buttord (WP, WS, RP, RS)
+ -- Function File: N = buttord ([WP1, WP2], [WS1, WS2], RP, RS)
+ -- Function File: N = buttord ([WP1, WP2], [WS1, WS2], RP, RS, "s")
+ -- Function File: [N, WC_P] = buttord (...)
+ -- Function File: [N, WC_P, WC_S] = buttord (...)
+     Compute the minimum filter order of a Butterworth filter with the
+     desired response characteristics.  The filter frequency band edges
+     are specified by the passband frequency WP and stopband frequency
+     WS.  Frequencies are normalized to the Nyquist frequency in the
+     range [0,1].  RP is the allowable passband ripple measured in
+     decibels, and RS is the minimum attenuation in the stop band, also
+     in decibels.
+
+     The output arguments N and WC_P (or N and WC_N) can be given as
+     inputs to ‘butter’.  Using WC_P makes the filter characteristic
+     touch at least one pass band corner and using WC_S makes the
+     characteristic touch at least one stop band corner.
+
+     If WP and WS are scalars, then WP is the passband cutoff frequency
+     and WS is the stopband edge frequency.  If WS is greater than WP,
+     the filter is a low-pass filter.  If WP is greater than WS, the
+     filter is a high-pass filter.
+
+     If WP and WS are vectors of length 2, then WP defines the passband
+     interval and WS defines the stopband interval.  If WP is contained
+     within WS (WS1 < WP1 < WP2 < WS2), the filter is a band-pass
+     filter.  If WS is contained within WP (WP1 < WS1 < WS2 < WP2), the
+     filter is a band-stop or band-reject filter.
+
+     If the optional argument ‘"s"’ is given, the minimum order for an
+     analog elliptic filter is computed.  All frequencies WP and WS are
+     specified in radians per second.
+
+     Theory: For Low pass filters, |H(W)|^2 = 1/[1+(W/Wc)^(2N)] =
+     10^(-R/10).  With some algebra, you can solve simultaneously for Wc
+     and N given Ws,Rs and Wp,Rp.  Rounding N to the next greater
+     integer, one can recalculate the allowable range for Wc (filter
+     caracteristic touching the pass band edge or the stop band edge).
+
+     For other types of filter, before making the above calculation, the
+     requirements must be transformed to LP requirements.  After
+     calculation, Wc must be transformed back to original filter type.
+
+     See also: butter, cheb1ord, cheb2ord, ellipord.
+
+3.7.7 cheb
+----------
+
+ -- Function File: cheb (N, X)
+     Returns the value of the nth-order Chebyshev polynomial calculated
+     at the point x.  The Chebyshev polynomials are defined by the
+     equations:
+
+                     / cos(n acos(x),    |x| <= 1
+             Tn(x) = |
+                     \ cosh(n acosh(x),  |x| > 1
+
+     If x is a vector, the output is a vector of the same size, where
+     each element is calculated as y(i) = Tn(x(i)).
+
+3.7.8 cheb1ap
+-------------
+
+ -- Function File: [Z, P, G] = cheb1ap (N, RP)
+     Design lowpass analog Chebyshev type I filter.
+
+     This function exists for MATLAB compatibility only, and is
+     equivalent to ‘cheby1 (N, RP, 1, "s")’.
+
+     See also: cheby1.
+
+3.7.9 cheb1ord
+--------------
+
+ -- Function File: N = cheb1ord (WP, WS, RP, RS)
+ -- Function File: N = cheb1ord ([WP1, WP2], [WS1, WS2], RP, RS)
+ -- Function File: N = cheb1ord ([WP1, WP2], [WS1, WS2], RP, RS, "s")
+ -- Function File: [N, WC] = cheb1ord (...)
+ -- Function File: [N, WC_P, WC_S] = cheb1ord (...)
+     Compute the minimum filter order of a Chebyshev type I filter with
+     the desired response characteristics.  The filter frequency band
+     edges are specified by the passband frequency WP and stopband
+     frequency WS.  Frequencies are normalized to the Nyquist frequency
+     in the range [0,1].  RP is the allowable passband ripple measured
+     in decibels, and RS is the minimum attenuation in the stop band,
+     also in decibels.
+
+     The output arguments N and WC_P (or N and WC_S) can be given as
+     inputs to ‘cheby1’.  Using WC_P makes the filter characteristic
+     touch at least one pass band corner and using WC_S makes the
+     characteristic touch at least one stop band corner.
+
+     If WP and WS are scalars, then WP is the passband cutoff frequency
+     and WS is the stopband edge frequency.  If WS is greater than WP,
+     the filter is a low-pass filter.  If WP is greater than WS, the
+     filter is a high-pass filter.
+
+     If WP and WS are vectors of length 2, then WP defines the passband
+     interval and WS defines the stopband interval.  If WP is contained
+     within WS (WS1 < WP1 < WP2 < WS2), the filter is a band-pass
+     filter.  If WS is contained within WP (WP1 < WS1 < WS2 < WP2), the
+     filter is a band-stop or band-reject filter.
+
+     If the optional argument ‘"s"’ is given, the minimum order for an
+     analog elliptic filter is computed.  All frequencies WP and WS are
+     specified in radians per second.
+
+     See also: buttord, cheby1, cheb2ord, ellipord.
+
+3.7.10 cheb2ap
+--------------
+
+ -- Function File: [Z, P, G] = cheb2ap (N, RS)
+     Design lowpass analog Chebyshev type II filter.
+
+     This function exists for MATLAB compatibility only, and is
+     equivalent to ‘cheby2 (N, RS, 1, "s")’.
+
+     Demo
+           demo cheb2ap
+
+     See also: cheby2.
+
+3.7.11 cheb2ord
+---------------
+
+ -- Function File: N = cheb2ord (WP, WS, RP, RS)
+ -- Function File: N = cheb2ord ([WP1, WP2], [WS1, WS2], RP, RS)
+ -- Function File: N = cheb2ord ([WP1, WP2], [WS1, WS2], RP, RS, "s")
+ -- Function File: [N, WC_S] = cheb2ord (...)
+ -- Function File: [N, WC_S, WC_P] = cheb2ord (...)
+     Compute the minimum filter order of a Chebyshev type II filter with
+     the desired response characteristics.  The filter frequency band
+     edges are specified by the passband frequency WP and stopband
+     frequency WS.  Frequencies are normalized to the Nyquist frequency
+     in the range [0,1].  RP is the allowable passband ripple measured
+     in decibels, and RS is the minimum attenuation in the stop band,
+     also in decibels.
+
+     The output arguments N and WC_P (or N and WC_S) can be given as
+     inputs to ‘cheby2’.  Using WC_P makes the filter characteristic
+     touch at least one pass band corner and using WC_S makes the
+     characteristic touch at least one stop band corner.
+
+     If WP and WS are scalars, then WP is the passband cutoff frequency
+     and WS is the stopband edge frequency.  If WS is greater than WP,
+     the filter is a low-pass filter.  If WP is greater than WS, the
+     filter is a high-pass filter.
+
+     If WP and WS are vectors of length 2, then WP defines the passband
+     interval and WS defines the stopband interval.  If WP is contained
+     within WS (WS1 < WP1 < WP2 < WS2), the filter is a band-pass
+     filter.  If WS is contained within WP (WP1 < WS1 < WS2 < WP2), the
+     filter is a band-stop or band-reject filter.
+
+     If the optional argument ‘"s"’ is given, the minimum order for an
+     analog elliptic filter is computed.  All frequencies WP and WS are
+     specified in radians per second.
+
+     See also: buttord, cheb1ord, cheby2, ellipord.
+
+3.7.12 cheby1
+-------------
+
+ -- Function File: [B, A] = cheby1 (N, RP, W)
+ -- Function File: [B, A] = cheby1 (N, RP, W, "high")
+ -- Function File: [B, A] = cheby1 (N, RP, [WL, WH])
+ -- Function File: [B, A] = cheby1 (N, RP, [WL, WH], "stop")
+ -- Function File: [Z, P, G] = cheby1 (...)
+ -- Function File: [A, B, C, D] = cheby1 (...)
+ -- Function File: [...] = cheby1 (..., "s")
+     Generate a Chebyshev type I filter with RP dB of passband ripple.
+
+     [b, a] = cheby1(n, Rp, Wc) low pass filter with cutoff pi*Wc
+     radians
+
+     [b, a] = cheby1(n, Rp, Wc, ’high’) high pass filter with cutoff
+     pi*Wc radians
+
+     [b, a] = cheby1(n, Rp, [Wl, Wh]) band pass filter with edges pi*Wl
+     and pi*Wh radians
+
+     [b, a] = cheby1(n, Rp, [Wl, Wh], ’stop’) band reject filter with
+     edges pi*Wl and pi*Wh radians
+
+     [z, p, g] = cheby1(...)  return filter as zero-pole-gain rather
+     than coefficients of the numerator and denominator polynomials.
+
+     [...]  = cheby1(...,’s’) return a Laplace space filter, W can be
+     larger than 1.
+
+     [a,b,c,d] = cheby1(...)  return state-space matrices
+
+     References:
+
+     Parks & Burrus (1987).  Digital Filter Design.  New York: John
+     Wiley & Sons, Inc.
+
+3.7.13 cheby2
+-------------
+
+ -- Function File: [B, A] = cheby2 (N, RS, WC)
+ -- Function File: [B, A] = cheby2 (N, RS, WC, "high")
+ -- Function File: [B, A] = cheby2 (N, RS, [WL, WH])
+ -- Function File: [B, A] = cheby2 (N, RS, [WL, WH], "stop")
+ -- Function File: [Z, P, G] = cheby2 (...)
+ -- Function File: [A, B, C, D] = cheby2 (...)
+ -- Function File: [...] = cheby2 (..., "s")
+     Generate a Chebyshev type II filter with RS dB of stopband
+     attenuation.
+
+     [b, a] = cheby2(n, Rs, Wc) low pass filter with cutoff pi*Wc
+     radians
+
+     [b, a] = cheby2(n, Rs, Wc, ’high’) high pass filter with cutoff
+     pi*Wc radians
+
+     [b, a] = cheby2(n, Rs, [Wl, Wh]) band pass filter with edges pi*Wl
+     and pi*Wh radians
+
+     [b, a] = cheby2(n, Rs, [Wl, Wh], ’stop’) band reject filter with
+     edges pi*Wl and pi*Wh radians
+
+     [z, p, g] = cheby2(...)  return filter as zero-pole-gain rather
+     than coefficients of the numerator and denominator polynomials.
+
+     [...]  = cheby2(...,’s’) return a Laplace space filter, W can be
+     larger than 1.
+
+     [a,b,c,d] = cheby2(...)  return state-space matrices
+
+     References:
+
+     Parks & Burrus (1987).  Digital Filter Design.  New York: John
+     Wiley & Sons, Inc.
+
+3.7.14 ellip
+------------
+
+ -- Function File: [B, A] = ellip (N, RP, RS, WP)
+ -- Function File: [B, A] = ellip (N, RP, RS, WP, "high")
+ -- Function File: [B, A] = ellip (N, RP, RS, [WL, WH])
+ -- Function File: [B, A] = ellip (N, RP, RS, [WL, WH], "stop")
+ -- Function File: [Z, P, G] = ellip (...)
+ -- Function File: [A, B, C, D] = ellip (...)
+ -- Function File: [...] = ellip (..., "s")
+
+     Generate an elliptic or Cauer filter with RP dB of passband ripple
+     and RS dB of stopband attenuation.
+
+     [b,a] = ellip(n, Rp, Rs, Wp) low pass filter with order n, cutoff
+     pi*Wp radians, Rp decibels of ripple in the passband and a stopband
+     Rs decibels down.
+
+     [b,a] = ellip(n, Rp, Rs, Wp, ’high’) high pass filter with cutoff
+     pi*Wp...
+
+     [b,a] = ellip(n, Rp, Rs, [Wl, Wh]) band pass filter with band pass
+     edges pi*Wl and pi*Wh ...
+
+     [b,a] = ellip(n, Rp, Rs, [Wl, Wh], ’stop’) band reject filter with
+     edges pi*Wl and pi*Wh, ...
+
+     [z,p,g] = ellip(...)  return filter as zero-pole-gain.
+
+     [...]  = ellip(...,’s’) return a Laplace space filter, W can be
+     larger than 1.
+
+     [a,b,c,d] = ellip(...)  return state-space matrices
+
+     References:
+
+     - Oppenheim, Alan V., Discrete Time Signal Processing, Hardcover,
+     1999.  - Parente Ribeiro, E., Notas de aula da disciplina TE498 -
+     Processamento Digital de Sinais, UFPR, 2001/2002.
+
+3.7.15 ellipap
+--------------
+
+ -- Function File: [Z, P, G] = ellipap (N, RP, RS)
+     Design lowpass analog elliptic filter.
+
+     This function exists for MATLAB compatibility only, and is
+     equivalent to ‘ellip (N, RP, RS, 1, "s")’.
+
+     See also: ellip.
+
+3.7.16 ellipord
+---------------
+
+ -- Function File: N = ellipord (WP, WS, RP, RS)
+ -- Function File: N = ellipord ([WP1, WP2], [WS1, WS2], RP, RS)
+ -- Function File: N = ellipord ([WP1, WP2], [WS1, WS2], RP, RS, "s")
+ -- Function File: [N, WC] = ellipord (...)
+     Compute the minimum filter order of an elliptic filter with the
+     desired response characteristics.  The filter frequency band edges
+     are specified by the passband frequency WP and stopband frequency
+     WS.  Frequencies are normalized to the Nyquist frequency in the
+     range [0,1].  RP is the allowable passband ripple measured in
+     decibels, and RS is the minimum attenuation in the stop band, also
+     in decibels.  The output arguments N and WC can be given as inputs
+     to ‘ellip’.
+
+     If WP and WS are scalars, then WP is the passband cutoff frequency
+     and WS is the stopband edge frequency.  If WS is greater than WP,
+     the filter is a low-pass filter.  If WP is greater than WS, the
+     filter is a high-pass filter.
+
+     If WP and WS are vectors of length 2, then WP defines the passband
+     interval and WS defines the stopband interval.  If WP is contained
+     within WS (WS1 < WP1 < WP2 < WS2), the filter is a band-pass
+     filter.  If WS is contained within WP (WP1 < WS1 < WS2 < WP2), the
+     filter is a band-stop or band-reject filter.
+
+     If the optional argument ‘"s"’ is given, the minimum order for an
+     analog elliptic filter is computed.  All frequencies WP and WS are
+     specified in radians per second.
+
+     Reference: Lamar, Marcus Vinicius, ‘Notas de aula da disciplina TE
+     456 - Circuitos Analogicos II’, UFPR, 2001/2002.
+
+     See also: buttord, cheb1ord, cheb2ord, ellip.
+
+3.7.17 firpm
+------------
+
+ -- Loadable Function: B = firpm (N, F, A)
+ -- Loadable Function: B = firpm (N, F, @RESPFN)
+ -- Loadable Function: B = firpm (N, F, {@RESPFN, ...})
+ -- Loadable Function: B = firpm (..., W)
+ -- Loadable Function: B = firpm (..., CLASS)
+ -- Loadable Function: B = firpm (..., {ACCURACY, ...})
+ -- Loadable Function: [B, MINIMAX] = firpm (...)
+ -- Loadable Function: [B, MINIMAX, RES] = firpm (...)
+
+     Designs a linear-phase FIR filter according to given specifications
+     and the ‘minimax’ criterion.  The method (per McClellan et al.(1))
+     uses successive approximation to minimize the maximum weighted
+     error between the desired and actual frequency response of the
+     filter.  Such filters are variably described as being ‘minimax’,
+     ‘equiripple’, or ‘optimal (in the Chebyshev sense)’.
+
+     Arguments
+     =========
+
+     ...
+          Where shown as the first argument to ‘firpm’, indicates that
+          any previously-indicated list of arguments may substitute for
+          the ellipsis.
+
+     N
+          A positive integer giving the filter order.
+
+     F
+          A vector of real-numbers, increasing in the range [0,1],
+          giving the frequencies of the left and right edges of each
+          band for which a specific amplitude response is desired: [l1
+          r1 l2 r2 ...].  1 represents the Nyquist-frequency.
+          Transition-bands are defined implicitly as the regions between
+          or outside the given bands.
+
+     A
+          A vector of real-numbers giving the desired amplitude
+          response.  An amplitude value is given either for each band
+          edge: [a(l1) a(r1) a(l2) a(r2) ...], or for each band: [a1 a2
+          ...].  In the former case, in-band amplitude is determined by
+          linear interpolation between the given band-edge values.  1
+          represents unity-gain, 0 represents infinite attenuation, and
+          −1 represents a phase change of pi radians.
+
+          Note that amplitude response is necessarily zero at F=0 for
+          type III and IV filters, and at F=1 for type II and III
+          filters.
+
+     @RESPFN
+          A handle to a ‘response function’ that supplies the desired
+          amplitude response and error-weighting.  This, unlike A above,
+          allows the response to be arbitrary (subject to the note
+          above).  firpm invokes the response function according to the
+          following syntax:
+
+               AG = respFn (N,F,G,W, ...)
+               [AG WG] = respFn (N,F,G,W, ...)
+               SYMMETRY = respFn ("defaults", {N,F,G,W, ...})
+
+          where:
+             • N and F are as given to firpm.
+
+             • W is as given to firpm, or ones if not given.
+
+             • AG and WG are the desired amplitude and weighting
+               functions evaluated at each frequency in vector G (which
+               are frequencies within the non-transition bands of F).
+               Returning AG alone gives uniform weighting.
+
+             • SYMMETRY is either "even" or "odd"; this provides an
+               alternative to using the CLASS values "symmetric" and
+               "antisymmetric".
+
+             • Per the ellipses shown here and above, when @RESPFN is
+               given contained in a cell-array, any additionally
+               contained values are appended to the RESPFN invocation
+               argument-list.
+
+     W
+          When used in conjunction with A, W is a vector of positive
+          real-numbers giving error-weightings to be applied at each
+          given band-edge [w(l1) w(r1) w(l2) w(r2) ...], or for each
+          band [w1 w2 ...].  In the former case, in-band weighting is
+          determined by linear interpolation between the given band-edge
+          values.  A higher relative error weighting yields a lower
+          relative error.
+
+          When used in conjunction with @RESPFN, W is a vector
+          (constrained as above) that is passed through to RESPFN.
+
+     CLASS
+          A string, which may be abbreviated, giving the filter-class:
+
+             • "symmetric" (the default) for type I or II filters,
+
+             • "antisymmetric" (or "hilbert") for standard type III or
+               IV filters,
+
+             • "differentiator" for type III or IV filters with inverted
+               phase and with error-weighting (further to W) of 2/f
+               applied in the pass-band(s).
+
+     ACCURACY, ...
+          Up to three properties contained within a cell-array:
+          ACCURACY, PERSISTENCE, ROBUSTNESS, that respectively control
+          how close the computed filter will be to the ideal minimax
+          solution, the number of computation iterations over which the
+          required accuracy will be sought, and the precision of certain
+          internal processing.  Each can each be set to a small positive
+          number (typically ≤3), to increase the relevant item; this may
+          increase computation time, but the need to do so should be
+          rare.  A value of 0 can be used to leave an item unchanged.
+
+          Alternatively, setting ACCURACY ≥16 emulates MATLAB’s LGRID
+          argument.
+
+     Results
+     =======
+
+     If a problem occurs during the computation, a diagnostic message
+     will normally be displayed.  If this happens, adjusting ACCURACY,
+     PERSISTENCE, or ROBUSTNESS may provide the solution.  Some filters
+     however, may not be realizable due to machine-precision
+     limitations.  If a filter can be computed, returned values are as
+     follows:
+
+     B
+          A length N+1 row-vector containing the computed filter
+          coefficients.
+
+     MINIMAX
+          The absolute value of the minimized, maximum weighted error,
+          or this number negated if the required accuracy could not be
+          achieved.
+
+     RES
+          A structure of data relating to the filter computation and a
+          partial response-analysis of the resultant filter; fields are
+          vectors:
+               ‘fgrid’   Analysis frequencies per F.
+               ‘des’     Desired amplitude response.
+               ‘wt’      Error weighting.
+               ‘H’       Complex frequency response.
+               ‘error’   Desired minus actual amplitude response.
+               ‘iextr’   Indices of local peaks in ‘error’.
+               ‘fextr’   Frequencies of local peaks in ‘error’.
+
+     Using RES is not recommended because it can be slow to compute and,
+     since the analysis excludes transition-bands, any ‘anomalies’(2)
+     therein are not easy to discern.  In general, ‘freqz’ suffices to
+     check that the response of the computed filter is satisfactory.
+
+     Examples
+     ========
+
+          # Low-pass with frequencies in Hz:
+          Fs = 96000; Fn = Fs/2; # Sampling & Nyquist frequencies.
+          b = firpm (50, [0 20000 28000 48000] / Fn, [1 0]);
+
+          # Type IV high-pass:
+          b = firpm (31, [0 0.5 0.7 1], [0 1], "antisym");
+
+          # Inverse-sinc (arbitrary response):
+          b = firpm (20, [0 0.5 0.9 1], @(n,f,g) ...
+          deal ((g<=f(2))./sinc (g), (g>=f(3))*9+1));
+
+          # Band-pass with filter-response check:
+          freqz (firpm (40, [0 3 4 6 8 10]/10, [0 1 0]))
+
+     Further examples can be found in the ‘firpm’ and ‘firpmord’
+     demonstration scripts.
+
+     Compatibility
+     =============
+
+     Given invalid filter specifications, Octave emits an error and does
+     not produce a filter; MATLAB in such circumstances may still
+     produce filter coefficients.
+
+     Unlike with MATLAB, with Octave MINIMAX can be negative; for
+     compatibility, take the absolute value.
+
+     See also: firpmord.
+
+3.7.18 firpmord
+---------------
+
+ -- Function File: [N, FOUT, A, W] = firpmord (F, A, D)
+ -- Function File: [N, FOUT, A, W] = firpmord (F, A, D, FS)
+ -- Function File: C = firpmord (F, A, D, "cell")
+ -- Function File: C = firpmord (F, A, D, FS, "cell")
+
+     Estimate the filter-order needed for ‘firpm’ to design a type-I or
+     type-II linear-phase FIR filter according to the given
+     specifications.
+
+     Arguments
+     =========
+
+     F
+          A vector of real-numbers, increasing in the range (0, FS/2),
+          giving the frequencies of the left and right edges of each
+          band for which a specific amplitude response is desired
+          (omitting 0 and FS/2, which are implied): [r1 l2 r2 ...].
+          Transition-bands are defined implicitly as the regions between
+          the given bands.
+
+     A
+          A vector of real-numbers giving the ideal amplitude response.
+          An amplitude value is given for each band specified by F: [a1
+          a2 ...].  1 represents unity-gain, 0 represents infinite
+          attenuation, and −1 represents a phase change of pi radians.
+
+     D
+          A vector of positive real-numbers giving the maximum allowable
+          linear deviation from the amplitudes given in A, thus
+          constraining the actual amplitude response (where defined by
+          F) to be within A +/− D.  Note that, though related, D does
+          not equate to ‘firpm’’s W argument.
+
+     FS
+
+          The sampling-frequency, which defaults to 2.
+
+     Usage
+     =====
+
+     The function returns the estimated filter-order, together with the
+     other design specification values, in one of two forms suitable for
+     use with ‘firpm’.  By default, multiple return values are used;
+     alternatively, by giving "cell" (or "c") as the last argument to
+     ‘firpmord’, the returned values are contained within a cell-array
+     that can, if desired, be passed directly to ‘firpm’.
+
+     The following examples illustrate the use of both mechanisms, as
+     well as aspects of ‘firpmord’ usage in general:
+
+           # Low-pass; frequencies in kHz:
+           [n f a w] = firpmord ([2.5 3], [1 0], [0.01 db2mag(-60)], 8);
+           b = firpm (n, f, a, w);
+
+           # Band-pass:
+           c = firpmord ([3 4 8 9], [0 1 0], [1e-3 1e-2 1e-3], 20, "cell");
+           b = firpm (c{:});
+
+           # High-pass:
+           b = firpm (firpmord ([6.4 8]/16, [0 1], [1e-4 0.01], "c"){:});
+
+     In cases where elements of D follow a repeating pattern (e.g. all
+     the elements are equal, or elements corresponding to pass-bands are
+     equal and elements corresponding to stop-bands are equal), only as
+     many elements as are needed to establish the pattern need be given.
+
+     For example, the following ‘firpmord’ invocation pairs are
+     equivalent:
+
+           # Low-pass:
+           firpmord ([0.4 0.5], [0 1], [db2mag(-72) db2mag(-72)]);
+           firpmord ([0.4 0.5], [0 1], [db2mag(-72)]);
+
+           # Multi-band-pass:
+           ds = db2mag(-80); dp = 0.01;
+           firpmord ([1 2 3 4 5 6 7 8]/10, [0 1 0 1 0], [ds dp ds dp ds]);
+           firpmord ([1 2 3 4 5 6 7 8]/10, [0 1 0 1 0], [ds dp]);
+
+     Notes
+     =====
+
+     The estimation algorithm used is per Ichige et al.(3)  Accuracy
+     tends to decrease as the number of bands increases.  Even with two
+     bands (i.e. high-pass or low-pass), the algorithm may under- or
+     over-estimate.  See the ‘firpmord’ demonstrations for some
+     examples.
+
+     In order to precisely determine the minimum order needed for a
+     particular design, ‘firpmord’ could be used to seed an algorithm
+     iterating invocations of ‘firpm’ (as exemplified in demonstration
+     number five).
+
+     Related documentation
+     =====================
+
+     See also: firpm, kaiserord.
+
+3.7.19 impinvar
+---------------
+
+ -- Function File: [B_OUT, A_OUT] = impinvar (B, A, FS, TOL)
+ -- Function File: [B_OUT, A_OUT] = impinvar (B, A, FS)
+ -- Function File: [B_OUT, A_OUT] = impinvar (B, A)
+     Converts analog filter with coefficients B and A to digital,
+     conserving impulse response.
+
+     If FS is not specified, or is an empty vector, it defaults to 1Hz.
+
+     If TOL is not specified, it defaults to 0.0001 (0.1%) This function
+     does the inverse of impinvar so that the following example should
+     restore the original values of A and B.
+
+     ‘invimpinvar’ implements the reverse of this function.
+           [b, a] = impinvar (b, a);
+           [b, a] = invimpinvar (b, a);
+
+     Reference: Thomas J. Cavicchi (1996) “Impulse invariance and
+     multiple-order poles”.  IEEE transactions on signal processing, Vol
+     44 (9): 2344–2347
+
+     See also: bilinear, invimpinvar.
+
+3.7.20 invimpinvar
+------------------
+
+ -- Function File: [B_OUT, A_OUT] = invimpinvar (B, A, FS, TOL)
+ -- Function File: [B_OUT, A_OUT] = invimpinvar (B, A, FS)
+ -- Function File: [B_OUT, A_OUT] = invimpinvar (B, A)
+     Converts digital filter with coefficients B and A to analog,
+     conserving impulse response.
+
+     This function does the inverse of impinvar so that the following
+     example should restore the original values of A and B.
+           [b, a] = impinvar (b, a);
+           [b, a] = invimpinvar (b, a);
+
+     If FS is not specified, or is an empty vector, it defaults to 1Hz.
+
+     If TOL is not specified, it defaults to 0.0001 (0.1%)
+
+     Reference: Thomas J. Cavicchi (1996) “Impulse invariance and
+     multiple-order poles”.  IEEE transactions on signal processing, Vol
+     40 (9): 2344–2347
+
+     See also: bilinear, impinvar.
+
+3.7.21 ncauer
+-------------
+
+ -- Function File: [Z, P, G] = cauer(RP, RS, N)
+     Analog prototype for Cauer filter.
+
+     Rp
+          Passband ripple
+     Rs
+          Stopband ripple
+     n
+          Desired order
+     z
+          complex vector of zeros for the model.
+     p
+          complex vector of poles for the model.
+     g
+          gain value.
+
+     References:
+
+     - Serra, Celso Penteado, Teoria e Projeto de Filtros, Campinas:
+     CARTGRAF, 1983.
+
+     - Lamar, Marcus Vinicius, Notas de aula da disciplina TE 456 -
+     Circuitos Analogicos II, UFPR, 2001/2002.
+
+3.7.22 pei_tseng_notch
+----------------------
+
+ -- Function File: [B, A] = pei_tseng_notch (FREQUENCIES, BANDWIDTHS)
+     Return coefficients for an IIR notch-filter with one or more filter
+     frequencies and according (very narrow) bandwidths to be used with
+     ‘filter’ or ‘filtfilt’.  The filter construction is based on an
+     allpass which performs a reversal of phase at the filter
+     frequencies.  Thus, the mean of the phase-distorted and the
+     original signal has the respective frequencies removed.  See the
+     demo for an illustration.
+
+     Original source: Pei, Soo-Chang, and Chien-Cheng Tseng "IIR
+     Multiple Notch Filter Design Based on Allpass Filter" 1996 IEEE
+     Tencon doi: 10.1109/TENCON.1996.608814)
+
+3.7.23 sftrans
+--------------
+
+ -- Function File: [SZ, SP, SG] = sftrans (SZ, SP, SG, W, STOP)
+
+     Transform band edges of a generic lowpass filter (cutoff at W=1)
+     represented in splane zero-pole-gain form.  W is the edge of the
+     target filter (or edges if band pass or band stop).  Stop is true
+     for high pass and band stop filters or false for low pass and band
+     pass filters.  Filter edges are specified in radians, from 0 to pi
+     (the nyquist frequency).
+
+     Theory: Given a low pass filter represented by poles and zeros in
+     the splane, you can convert it to a low pass, high pass, band pass
+     or band stop by transforming each of the poles and zeros
+     individually.  The following table summarizes the transformation:
+
+           Transform         Zero at x                  Pole at x
+           ----------------  -------------------------  ------------------------
+           Low Pass          zero: Fc x/C               pole: Fc x/C
+           S -> C S/Fc       gain: C/Fc                 gain: Fc/C
+           ----------------  -------------------------  ------------------------
+           High Pass         zero: Fc C/x               pole: Fc C/x
+           S -> C Fc/S       pole: 0                    zero: 0
+                             gain: -x                   gain: -1/x
+           ----------------  -------------------------  ------------------------
+           Band Pass         zero: b +- sqrt(b^2-FhFl)  pole: b +- sqrt(b^2-FhFl)
+                  S^2+FhFl   pole: 0                    zero: 0
+           S -> C --------   gain: C/(Fh-Fl)            gain: (Fh-Fl)/C
+                  S(Fh-Fl)   b=x/C (Fh-Fl)/2            b=x/C (Fh-Fl)/2
+           ----------------  -------------------------  ------------------------
+           Band Stop         zero: b +- sqrt(b^2-FhFl)  pole: b +- sqrt(b^2-FhFl)
+                  S(Fh-Fl)   pole: +-sqrt(-FhFl)        zero: +-sqrt(-FhFl)
+           S -> C --------   gain: -x                   gain: -1/x
+                  S^2+FhFl   b=C/x (Fh-Fl)/2            b=C/x (Fh-Fl)/2
+           ----------------  -------------------------  ------------------------
+           Bilinear          zero: (2+xT)/(2-xT)        pole: (2+xT)/(2-xT)
+                2 z-1        pole: -1                   zero: -1
+           S -> - ---        gain: (2-xT)/T             gain: (2-xT)/T
+                T z+1
+           ----------------  -------------------------  ------------------------
+
+     where C is the cutoff frequency of the initial lowpass filter, Fc
+     is the edge of the target low/high pass filter and [Fl,Fh] are the
+     edges of the target band pass/stop filter.  With abundant tedious
+     algebra, you can derive the above formulae yourself by substituting
+     the transform for S into H(S)=S-x for a zero at x or H(S)=1/(S-x)
+     for a pole at x, and converting the result into the form:
+
+              H(S)=g prod(S-Xi)/prod(S-Xj)
+
+     The transforms are from the references.  The actual pole-zero-gain
+     changes I derived myself.
+
+     Please note that a pole and a zero at the same place exactly
+     cancel.  This is significant for High Pass, Band Pass and Band Stop
+     filters which create numerous extra poles and zeros, most of which
+     cancel.  Those which do not cancel have a "fill-in" effect,
+     extending the shorter of the sets to have the same number of as the
+     longer of the sets of poles and zeros (or at least split the
+     difference in the case of the band pass filter).  There may be
+     other opportunistic cancellations but I will not check for them.
+
+     Also note that any pole on the unit circle or beyond will result in
+     an unstable filter.  Because of cancellation, this will only happen
+     if the number of poles is smaller than the number of zeros and the
+     filter is high pass or band pass.  The analytic design methods all
+     yield more poles than zeros, so this will not be a problem.
+
+     References:
+
+     Proakis & Manolakis (1992).  Digital Signal Processing.  New York:
+     Macmillan Publishing Company.
+
+   ---------- Footnotes ----------
+
+   (1) J. H. McClellan, T. W. Parks and L. R. Rabiner, ‘A Computer
+Program for Designing Optimum FIR Linear Phase Digital Filters’, IEEE
+Trans. Audio Electroacoust., vol. AU-21, 1973, pp. 506–525.
+
+   (2) Tapio Saramäki, ‘Finite impulse response filter design’, Chapter
+4 in ‘Handbook for Digital Signal Processing’, edited by S. K. Mitra and
+J. F. Kaiser, John Wiley and Sons, New York, 1993, pp. 155–277.
+(<http://www.cs.tut.fi/~ts/Mitra_Kaiser.pdf>)
+
+   (3) K. Ichige, M. Iwaki, algorithm and R. Ishii, ‘Accurate Estimation
+of Minimum Filter Length for Optimum FIR Digital Filters’, IEEE
+Transactions on Circuits and Systems, Vol. 47, No. 10, 2000, pp.
+1008–1017
+
+
+File: signal.info,  Node: FIR Filter Design,  Next: Transforms,  Prev: IIR Filter Design,  Up: Function Reference
+
+3.8 FIR Filter Design
+=====================
+
+3.8.1 cl2bp
+-----------
+
+ -- Loadable Function: H = cl2bp (M, W1, W2, UP, LO)
+ -- Loadable Function: H = cl2bp (M, W1, W2, UP, LO, GRIDSIZE)
+
+     Constrained L2 bandpass FIR filter design.  This is a fast
+     implementation of the algorithm cited below.  Compared to “remez”,
+     it offers implicit specification of transition bands, a higher
+     likelihood of convergence, and an error criterion combining
+     features of both L2 and Chebyshev approaches.
+
+     Inputs:
+
+     M
+          degree of cosine polynomial, i.e.  the number of output
+          coefficients will be M*2+1
+     W1
+     W2
+          bandpass filter cutoffs in the range 0 <= W1 < W2 <= pi, where
+          pi is the Nyquist frequency
+     UP
+          vector of 3 upper bounds for [stopband1, passband, stopband2]
+     LO
+          vector of 3 lower bounds for [stopband1, passband, stopband2]
+     GRIDSIZE
+          search grid size; larger values may improve accuracy, but
+          greatly increase calculation time.
+
+     Output:
+
+     A vector of M*2+1 FIR coefficients, or an empty value if the solver
+     failed to converge.
+
+     Example:
+          h = cl2bp(30, 0.3*pi, 0.6*pi, [0.02, 1.02, 0.02], [-0.02, 0.98, -0.02], 2^11);
+
+     Original Paper: I. W. Selesnick, M. Lang, and C. S. Burrus.  A
+     modified algorithm for constrained least square design of multiband
+     FIR filters without specified transition bands.  IEEE Trans.  on
+     Signal Processing, 46(2):497-501, February 1998.
+
+See also: remez.
+
+3.8.2 fir1
+----------
+
+ -- Function File: B = fir1 (N, W)
+ -- Function File: B = fir1 (N, W, TYPE)
+ -- Function File: B = fir1 (N, W, TYPE, WINDOW)
+ -- Function File: B = fir1 (N, W, TYPE, WINDOW, NOSCALE)
+
+     Produce an order N FIR filter with the given frequency cutoff W,
+     returning the N+1 filter coefficients in B.  If W is a scalar, it
+     specifies the frequency cutoff for a lowpass or highpass filter.
+     If W is a two-element vector, the two values specify the edges of a
+     bandpass or bandstop filter.  If W is an N-element vector, each
+     value specifies a band edge of a multiband pass/stop filter.
+
+     The filter TYPE can be specified with one of the following strings:
+     "low", "high", "stop", "pass", "bandpass", "DC-0", or "DC-1".  The
+     default is "low" is W is a scalar, "pass" if W is a pair, or "DC-0"
+     if W is a vector with more than 2 elements.
+
+     An optional shaping WINDOW can be given as a vector with length
+     N+1.  If not specified, a Hamming window of length N+1 is used.
+
+     With the option "noscale", the filter coefficients are not
+     normalized.  The default is to normalize the filter such that the
+     magnitude response of the center of the first passband is 1.
+
+     To apply the filter, use the return vector B with the ‘filter’
+     function, for example ‘y = filter (b, 1, x)’.
+
+     Examples:
+           freqz (fir1 (40, 0.3));
+           freqz (fir1 (15, [0.2, 0.5], "stop"));  # note the zero-crossing at 0.1
+           freqz (fir1 (15, [0.2, 0.5], "stop", "noscale"));
+
+     See also: filter, fir2.
+
+3.8.3 fir2
+----------
+
+ -- Function File: B = fir2 (N, F, M)
+ -- Function File: B = fir2 (N, F, M, GRID_N)
+ -- Function File: B = fir2 (N, F, M, GRID_N, RAMP_N)
+ -- Function File: B = fir2 (N, F, M, GRID_N, RAMP_N, WINDOW)
+
+     Produce an order N FIR filter with arbitrary frequency response M
+     over frequency bands F, returning the N+1 filter coefficients in B.
+     The vector F specifies the frequency band edges of the filter
+     response and M specifies the magnitude response at each frequency.
+
+     The vector F must be nondecreasing over the range [0,1], and the
+     first and last elements must be 0 and 1, respectively.  A
+     discontinuous jump in the frequency response can be specified by
+     duplicating a band edge in F with different values in M.
+
+     The resolution over which the frequency response is evaluated can
+     be controlled with the GRID_N argument.  The default is 512 or the
+     next larger power of 2 greater than the filter length.
+
+     The band transition width for discontinuities can be controlled
+     with the RAMP_N argument.  The default is GRID_N/25.  Larger values
+     will result in wider band transitions but better stopband
+     rejection.
+
+     An optional shaping WINDOW can be given as a vector with length
+     N+1.  If not specified, a Hamming window of length N+1 is used.
+
+     To apply the filter, use the return vector B with the ‘filter’
+     function, for example ‘y = filter (b, 1, x)’.
+
+     Example:
+           f = [0, 0.3, 0.3, 0.6, 0.6, 1]; m = [0, 0, 1, 1/2, 0, 0];
+           [h, w] = freqz (fir2 (100, f, m));
+           plot (f, m, ";target response;", w/pi, abs (h), ";filter response;");
+
+     See also: filter, fir1.
+
+3.8.4 firls
+-----------
+
+ -- Function File: B = firls (N, F, A)
+ -- Function File: B = firls (N, F, A, W)
+
+     FIR filter design using least squares method.  Returns a length N+1
+     linear phase filter such that the integral of the weighted mean
+     squared error in the specified bands is minimized.
+
+     The vector F specifies the frequencies of the band edges,
+     normalized so that half the sample frequency is equal to 1.  Each
+     band is specified by two frequencies, to the vector must have an
+     even length.
+
+     The vector A specifies the amplitude of the desired response at
+     each band edge.
+
+     The optional argument W is a weighting function that contains one
+     value for each band that weights the mean squared error in that
+     band.
+
+     A must be the same length as F, and W must be half the length of F.
+     N must be even.  If given an odd value, ‘firls’ increments it by 1.
+
+     The least squares optimization algorithm for computing FIR filter
+     coefficients is derived in detail in:
+
+     I. Selesnick, "Linear-Phase FIR Filter Design by Least Squares,"
+     http://cnx.org/content/m10577
+
+3.8.5 kaiserord
+---------------
+
+ -- Function File: [N, WN, BETA, FTYPE] = kaiserord (F, M, DEV)
+ -- Function File: [...] = kaiserord (F, M, DEV, FS)
+
+     Return the parameters needed to produce a filter of the desired
+     specification from a Kaiser window.  The vector F contains pairs of
+     frequency band edges in the range [0,1].  The vector M specifies
+     the magnitude response for each band.  The values of M must be zero
+     for all stop bands and must have the same magnitude for all pass
+     bands.  The deviation of the filter DEV can be specified as a
+     scalar or a vector of the same length as M.  The optional sampling
+     rate FS can be used to indicate that F is in Hz in the range
+     [0,FS/2].
+
+     The returned value N is the required order of the filter (the
+     length of the filter minus 1).  The vector WN contains the band
+     edges of the filter suitable for passing to ‘fir1’.  The value BETA
+     is the parameter of the Kaiser window of length N+1 to shape the
+     filter.  The string FTYPE contains the type of filter to specify to
+     ‘fir1’.
+
+     The Kaiser window parameters n and beta are computed from the
+     relation between ripple (A=-20*log10(dev)) and transition width (dw
+     in radians) discovered empirically by Kaiser:
+
+                     / 0.1102(A-8.7)                        A > 50
+              beta = | 0.5842(A-21)^0.4 + 0.07886(A-21)     21 <= A <= 50
+                     \ 0.0                                  A < 21
+
+              n = (A-8)/(2.285 dw)
+
+     Example:
+           [n, w, beta, ftype] = kaiserord ([1000, 1200], [1, 0], [0.05, 0.05], 11025);
+           b = fir1 (n, w, kaiser (n+1, beta), ftype, "noscale");
+           freqz (b, 1, [], 11025);
+
+     See also: fir1, kaiser.
+
+3.8.6 qp_kaiser
+---------------
+
+ -- Function File: qp_kaiser (NB, AT)
+ -- Function File: qp_kaiser (NB, AT, LINEAR)
+
+     Computes a finite impulse response (FIR) filter for use with a
+     quasi-perfect reconstruction polyphase-network filter bank.  This
+     version utilizes a Kaiser window to shape the frequency response of
+     the designed filter.  Tha number nb of bands and the desired
+     attenuation at in the stop-band are given as parameters.
+
+     The Kaiser window is multiplied by the ideal impulse response
+     h(n)=a.sinc(a.n) and converted to its minimum-phase version by
+     means of a Hilbert transform.
+
+     By using a third non-null argument, the minimum-phase calculation
+     is omitted at all.
+
+3.8.7 remez
+-----------
+
+ -- Loadable Function: B = remez (N, F, A)
+ -- Loadable Function: B = remez (N, F, A, W)
+ -- Loadable Function: B = remez (N, F, A, W, FTYPE)
+ -- Loadable Function: B = remez (N, F, A, W, FTYPE, GRIDDENSITY)
+     Parks-McClellan optimal FIR filter design.
+     N
+          gives the filter order, where the generated filter length taps
+          is n+1
+     F
+          gives frequency at the band edges [b1 e1 b2 e2 b3 e3 ...]
+     A
+          gives amplitude at the band edges [a(b1) a(e1) a(b2) a(e2)
+          ...]
+     W
+          gives weighting applied to each band
+     FTYPE
+          is "bandpass", "hilbert" or "differentiator"
+     GRIDDENSITY
+          determines how accurately the filter will be constructed.  The
+          minimum value is 16, but higher numbers are slower to compute.
+
+     Frequency is in the range (0, 1), with 1 being the Nyquist
+     frequency.
+
+3.8.8 sgolay
+------------
+
+ -- Function File: F = sgolay (P, N)
+ -- Function File: F = sgolay (P, N, M)
+ -- Function File: F = sgolay (P, N, M, TS)
+     Computes the filter coefficients for all Savitzsky-Golay smoothing
+     filters of order p for length n (odd).  m can be used in order to
+     get directly the mth derivative.  In this case, ts is a scaling
+     factor.
+
+     The early rows of F smooth based on future values and later rows
+     smooth based on past values, with the middle row using half future
+     and half past.  In particular, you can use row i to estimate x(k)
+     based on the i-1 preceding values and the n-i following values of x
+     values as y(k) = F(i,:) * x(k-i+1:k+n-i).
+
+     Normally, you would apply the first (n-1)/2 rows to the first k
+     points of the vector, the last k rows to the last k points of the
+     vector and middle row to the remainder, but for example if you were
+     running on a realtime system where you wanted to smooth based on
+     the all the data collected up to the current time, with a lag of
+     five samples, you could apply just the filter on row n-5 to your
+     window of length n each time you added a new sample.
+
+     Reference: Numerical recipes in C. p 650
+
+     See also: sgolayfilt.
+
+
+File: signal.info,  Node: Transforms,  Next: Power Spectrum Analysis,  Prev: FIR Filter Design,  Up: Function Reference
+
+3.9 Transforms
+==============
+
+3.9.1 bitrevorder
+-----------------
+
+ -- Function File: Y = bitrevorder (X)
+ -- Function File: [Y I] = bitrevorder (X)
+     Reorder the elements of the vector X in bit-reversed order.
+     Equivalent to calling ‘digitrevorder (X, 2)’.
+
+     See also: digitrevorder, fft, ifft.
+
+3.9.2 cceps
+-----------
+
+ -- Function File: cceps (X)
+ -- Function File: cceps (X, CORRECT)
+     Return the complex cepstrum of the vector X.  If the optional
+     argument CORRECT has the value 1, a correction method is applied.
+     The default is not to do this.
+
+3.9.3 cplxreal
+--------------
+
+ -- Function File: [ZC, ZR] = cplxreal (Z)
+ -- Function File: [ZC, ZR] = cplxreal (Z, TOL)
+ -- Function File: [ZC, ZR] = cplxreal (Z, TOL, DIM)
+     Sort the numbers Z into complex-conjugate-valued and real-valued
+     elements.  The positive imaginary complex numbers of each complex
+     conjugate pair are returned in ZC and the real numbers are returned
+     in ZR.
+
+     TOL is a weighting factor in the range [0, 1) which determines the
+     tolerance of the matching.  The default value is ‘100 * eps’ and
+     the resulting tolerance for a given complex pair is ‘TOL * abs
+     (Z(i)))’.
+
+     By default the complex pairs are sorted along the first
+     non-singleton dimension of Z.  If DIM is specified, then the
+     complex pairs are sorted along this dimension.
+
+     Signal an error if some complex numbers could not be paired.
+     Signal an error if all complex numbers are not exact conjugates (to
+     within TOL).  Note that there is no defined order for pairs with
+     identical real parts but differing imaginary parts.
+
+     See also: cplxpair.
+
+3.9.4 czt
+---------
+
+ -- Function File: czt (X)
+ -- Function File: czt (X, M)
+ -- Function File: czt (X, M, W)
+ -- Function File: czt (X, M, W, A)
+     Chirp z-transform.  Compute the frequency response starting at a
+     and stepping by w for m steps.  a is a point in the complex plane,
+     and w is the ratio between points in each step (i.e., radius
+     increases exponentially, and angle increases linearly).
+
+     To evaluate the frequency response for the range f1 to f2 in a
+     signal with sampling frequency Fs, use the following:
+
+           m = 32;                               ## number of points desired
+           w = exp(-j*2*pi*(f2-f1)/((m-1)*Fs));  ## freq. step of f2-f1/m
+           a = exp(j*2*pi*f1/Fs);                ## starting at frequency f1
+           y = czt(x, m, w, a);
+
+     If you don’t specify them, then the parameters default to a Fourier
+     transform: m=length(x), w=exp(-j*2*pi/m), a=1
+
+     If x is a matrix, the transform will be performed column-by-column.
+
+3.9.5 dct
+---------
+
+ -- Function File: dct (X)
+ -- Function File: dct (X, N)
+     Compute the discrete cosine transform of X.  If N is given, then X
+     is padded or trimmed to length N before computing the transform.
+     If X is a matrix, compute the transform along the columns of the
+     the matrix.  The transform is faster if X is real-valued and has
+     even length.
+
+     The discrete cosine transform X can be defined as follows:
+
+                         N-1
+             X[k] = w(k) sum x[n] cos (pi (2n+1) k / 2N ),  k = 0, ..., N-1
+                         n=0
+
+     with w(0) = sqrt(1/N) and w(k) = sqrt(2/N), k = 1, ..., N-1.  There
+     are other definitions with different scaling of X[k], but this form
+     is common in image processing.
+
+     See also: idct, dct2, idct2, dctmtx.
+
+3.9.6 dct2
+----------
+
+ -- Function File: dct2 (X)
+ -- Function File: dct2 (X, M, N)
+ -- Function File: dct2 (X, [M, N])
+     Compute the 2-D discrete cosine transform of matrix X.  If M and N
+     are specified, the input is padded or trimmed to the desired size.
+
+     See also: dct, idct, idct2.
+
+3.9.7 dctmtx
+------------
+
+ -- Function File: dctmtx (N)
+     Return the DCT transformation matrix of size N-by-N.
+
+     If A is an N-by-N matrix, then the following are true:
+
+               T*A    == dct(A),  T'*A   == idct(A)
+               T*A*T' == dct2(A), T'*A*T == idct2(A)
+
+     A DCT transformation matrix is useful for doing things like jpeg
+     image compression, in which an 8x8 DCT matrix is applied to
+     non-overlapping blocks throughout an image and only a subblock on
+     the top left of each block is kept.  During restoration, the
+     remainder of the block is filled with zeros and the inverse
+     transform is applied to the block.
+
+     See also: dct, idct, dct2, idct2.
+
+3.9.8 dftmtx
+------------
+
+ -- Function File: D = dftmtx (N)
+     Compute the N-by-N Fourier transformation matrix.  This is the
+     matrix D such that the Fourier transform of a column vector of
+     length N is given by ‘dftmtx(N) * X’ and the inverse Fourier
+     transform is given by ‘inv(dftmtx(N)) * X’.
+
+     In general this is less efficient than calling the ‘fft’ and ‘ifft’
+     functions directly.
+
+     See also: fft, ifft.
+
+3.9.9 digitrevorder
+-------------------
+
+ -- Function File: Y = digitrevorder (X, R)
+ -- Function File: [Y, I] = digitrevorder (X, R)
+     Reorder the elements of the vector X in digit-reversed order.  The
+     elements of X are converted to radix R and reversed.  The reordered
+     indices of the elements of X are returned in I.
+
+     See also: bitrevorder, fft, ifft.
+
+3.9.10 dst
+----------
+
+ -- Function File: Y = dst (X)
+ -- Function File: Y = dst (X, N)
+     Computes the type I discrete sine transform of X.  If N is given,
+     then X is padded or trimmed to length N before computing the
+     transform.  If X is a matrix, compute the transform along the
+     columns of the the matrix.
+
+     The discrete sine transform X of x can be defined as follows:
+
+             N
+      X[k] = sum x[n] sin (pi n k / (N+1) ),  k = 1, ..., N
+             n=1
+
+     See also: idst.
+
+3.9.11 dwt
+----------
+
+ -- Function File: [U, V] = dwt (X, WNAME)
+ -- Function File: [U, V] = dwt (X, HP, GP)
+ -- Function File: [U, V] = dwt (X, HP, GP, ...)
+     Discrete wavelet transform (1D).
+
+     *Inputs*
+     X
+          Signal vector.
+     WNAME
+          Wavelet name.
+     HP
+          Coefficients of low-pass decomposition FIR filter.
+     GP
+          Coefficients of high-pass decomposition FIR filter.
+
+     *Outputs*
+     U
+          Signal vector of average, approximation.
+     V
+          Signal vector of difference, detail.
+
+3.9.12 fht
+----------
+
+ -- Function File: M = fht (D)
+ -- Function File: M = fht (D, N)
+ -- Function File: M = fht (D, N, DIM)
+     Calculate the Fast Hartley Transform of real input D.  If D is a
+     matrix, the Hartley transform is calculated along the columns by
+     default.  The options N and DIM are similar to the options of FFT
+     function.
+
+     The forward and inverse Hartley transforms are the same (except for
+     a scale factor of 1/N for the inverse Hartley transform), but
+     implemented using different functions.
+
+     The definition of the forward hartley transform for vector d, m[K]
+     = \sum_{i=0}^{N-1} d[i]*(cos[K*2*pi*i/N] + sin[K*2*pi*i/N]), for 0
+     <= K < N. m[K] = \sum_{i=0}^{N-1} d[i]*CAS[K*i], for 0 <= K < N.
+
+           fht(1:4)
+
+     See also: ifht, fft.
+
+3.9.13 fwht
+-----------
+
+ -- Function File: fwht (X)
+ -- Function File: fwht (X, N)
+ -- Function File: fwht (X, N, ORDER)
+     Compute the Walsh-Hadamard transform of X using the Fast
+     Walsh-Hadamard Transform (FWHT) algorithm.  If the input is a
+     matrix, the FWHT is calculated along the columns of X.
+
+     The number of elements of X must be a power of 2; if not, the input
+     will be extended and filled with zeros.  If a second argument is
+     given, the input is truncated or extended to have length N.
+
+     The third argument specifies the ORDER in which the returned
+     Walsh-Hadamard transform coefficients should be arranged.  The
+     ORDER may be any of the following strings:
+
+     "sequency"
+          The coefficients are returned in sequency order.  This is the
+          default if ORDER is not given.
+
+     "hadamard"
+          The coefficients are returned in Hadamard order.
+
+     "dyadic"
+          The coefficients are returned in Gray code order.
+
+     See also: ifwht.
+
+3.9.14 hilbert
+--------------
+
+ -- Function File: H = hilbert (F, N, DIM)
+     Analytic extension of real valued signal.
+
+     ‘H = hilbert (F)’ computes the extension of the real valued signal
+     F to an analytic signal.  If F is a matrix, the transformation is
+     applied to each column.  For N-D arrays, the transformation is
+     applied to the first non-singleton dimension.
+
+     ‘real (H)’ contains the original signal F.  ‘imag (H)’ contains the
+     Hilbert transform of F.
+
+     ‘hilbert (F, N)’ does the same using a length N Hilbert transform.
+     The result will also have length N.
+
+     ‘hilbert (F, [], DIM)’ or ‘hilbert (F, N, DIM)’ does the same along
+     dimension DIM.
+
+3.9.15 idct
+-----------
+
+ -- Function File: Y = idct (X)
+ -- Function File: Y = idct (X, N)
+     Compute the inverse discrete cosine transform of X.  If N is given,
+     then X is padded or trimmed to length N before computing the
+     transform.  If X is a matrix, compute the transform along the
+     columns of the the matrix.  The transform is faster if X is
+     real-valued and even length.
+
+     The inverse discrete cosine transform X can be defined as follows:
+
+                    N-1
+             x[n] = sum w(k) X[k] cos (pi (2n+1) k / 2N ),  n = 0, ..., N-1
+                    k=0
+
+     with w(0) = sqrt(1/N) and w(k) = sqrt(2/N), k = 1, ..., N-1
+
+     See also: dct, dct2, idct2, dctmtx.
+
+3.9.16 idct2
+------------
+
+ -- Function File: Y = idct2 (X)
+ -- Function File: Y = idct2 (X, M, N)
+ -- Function File: Y = idct2 (X, [M, N])
+     Compute the inverse 2-D discrete cosine transform of matrix X.  If
+     M and N are specified, the input is either padded or truncated to
+     have M rows and N columns.
+
+3.9.17 idst
+-----------
+
+ -- Function File: Y = idst (X)
+ -- Function File: Y = idst (X, N)
+     Computes the inverse type I discrete sine transform of Y.  If N is
+     given, then Y is padded or trimmed to length N before computing the
+     transform.  If Y is a matrix, compute the transform along the
+     columns of the the matrix.
+
+     See also: dst.
+
+3.9.18 ifht
+-----------
+
+ -- Function File: M = ifht (D, N, DIM)
+     Calculate the inverse Fast Hartley Transform of real input D.  If D
+     is a matrix, the inverse Hartley transform is calculated along the
+     columns by default.  The options N and DIM are similar to the
+     options of FFT function.
+
+     The forward and inverse Hartley transforms are the same (except for
+     a scale factor of 1/N for the inverse hartley transform), but
+     implemented using different functions.
+
+     The definition of the forward hartley transform for vector d, m[K]
+     = 1/N \sum_{i=0}^{N-1} d[i]*(cos[K*2*pi*i/N] + sin[K*2*pi*i/N]),
+     for 0 <= K < N. m[K] = 1/N \sum_{i=0}^{N-1} d[i]*CAS[K*i], for 0 <=
+     K < N.
+
+           ifht(1:4)
+
+     See also: fht, fft.
+
+3.9.19 ifwht
+------------
+
+ -- Function File: ifwht (X)
+ -- Function File: ifwht (X, N)
+ -- Function File: ifwht (X, N, ORDER)
+     Compute the inverse Walsh-Hadamard transform of X using the Fast
+     Walsh-Hadamard Transform (FWHT) algorithm.  If the input is a
+     matrix, the inverse FWHT is calculated along the columns of X.
+
+     The number of elements of X must be a power of 2; if not, the input
+     will be extended and filled with zeros.  If a second argument is
+     given, the input is truncated or extended to have length N.
+
+     The third argument specifies the ORDER in which the returned
+     inverse Walsh-Hadamard transform coefficients should be arranged.
+     The ORDER may be any of the following strings:
+
+     "sequency"
+          The coefficients are returned in sequency order.  This is the
+          default if ORDER is not given.
+
+     "hadamard"
+          The coefficients are returned in Hadamard order.
+
+     "dyadic"
+          The coefficients are returned in Gray code order.
+
+     See also: fwht.
+
+3.9.20 rceps
+------------
+
+ -- Function File: [Y, YM] = rceps (X)
+     Return the cepstrum of the signal X.
+
+     If X is a matrix, return the cepstrum of each column.
+
+     If called with two output arguments, the minimum phase
+     reconstruction of the signal X is returned in YM.
+
+     For example:
+
+           f0 = 70; Fs = 10000;            # 100 Hz fundamental, 10kHz sampling rate
+           a = poly (0.985 * exp (1i * pi * [0.1, -0.1, 0.3, -0.3])); # two formants
+           s = 0.005 * randn (1024, 1);    # Noise excitation signal
+           s(1:Fs/f0:length(s)) = 1;       # Impulse glottal wave
+           x = filter (1, a, s);           # Speech signal
+           [y, ym] = rceps (x .* hanning (1024));
+
+     Reference: ‘Programs for Digital Signal Processing’, IEEE Press,
+     John Wiley & Sons, New York, 1979.
+
+
+File: signal.info,  Node: Power Spectrum Analysis,  Next: Window Functions,  Prev: Transforms,  Up: Function Reference
+
+3.10 Power Spectrum Analysis
+============================
+
+3.10.1 __power
+--------------
+
+ -- Function File: [P, W] = __power (B, A)
+ -- Function File: [...] = __power (B, A, NFFT)
+ -- Function File: [...] = __power (B, A, NFFT, FS)
+ -- Function File: [...] = __power (B, A, NFFT, FS, RANGE)
+ -- Function File: [...] = __power (B, A, NFFT, FS, RANGE, UNITS)
+ -- Function File: __power (...)
+
+     Plot the power spectrum of the given ARMA model.
+
+     b, a: filter coefficients (b=numerator, a=denominator) nfft is
+     number of points at which to sample the power spectrum Fs is the
+     sampling frequency of x range is ’half’ (default) or ’whole’ units
+     is ’squared’ or ’db’ (default) range and units may be specified any
+     time after the filter, in either order
+
+     Returns P, the magnitude vector, and w, the frequencies at which it
+     is sampled.  If there are no return values requested, then plot the
+     power spectrum and don’t return anything.
+
+3.10.2 ar_psd
+-------------
+
+ -- Function File: ar_psd (A, V)
+ -- Function File: ar_psd (A, V, FREQ)
+ -- Function File: ar_psd (A, V, FREQ, FS)
+ -- Function File: ar_psd (..., RANGE)
+ -- Function File: ar_psd (..., METHOD)
+ -- Function File: ar_psd (..., PLOTTYPE)
+ -- Function File: [PSD, F_OUT] = ar_psd (...)
+
+     Calculate the power spectrum of the autoregressive model
+
+                                  M
+           x(n) = sqrt(v).e(n) + SUM a(k).x(n-k)
+                                 k=1
+
+     where x(n) is the output of the model and e(n) is white noise.
+     This function is intended for use with ‘[a, v, k] = arburg (x,
+     poles, criterion)’ which use the Burg (1968) method to calculate a
+     "maximum entropy" autoregressive model of X.
+
+     If the FREQ argument is a vector (of frequencies) the spectrum is
+     calculated using the polynomial method and the METHOD argument is
+     ignored.  For scalar FREQ, an integer power of 2, or METHOD =
+     "FFT", causes the spectrum to be calculated by FFT. Otherwise, the
+     spectrum is calculated as a polynomial.  It may be computationally
+     more efficient to use the FFT method if length of the model is not
+     much smaller than the number of frequency values.  The spectrum is
+     scaled so that spectral energy (area under spectrum) is the same as
+     the time-domain energy (mean square of the signal).
+
+     ARGUMENTS: All but the first two arguments are optional and may be
+     empty.
+        • A list of M=(order+1) autoregressive model coefficients.  The
+          first element of "ar_coeffs" is the zero-lag coefficient,
+          which always has a value of 1.
+        • V square of the moving-average coefficient of the AR model.
+        • FREQ frequencies at which power spectral density is
+          calculated, or a scalar indicating the number of uniformly
+          distributed frequency values at which spectral density is
+          calculated.  (default = 256)
+        • FS sampling frequency (Hertz) (default=1)
+
+     CONTROL-STRING ARGUMENTS – each of these arguments is a character
+     string.  Control-string arguments can be in any order after the
+     other arguments.
+
+     Range:
+
+     ’half’, ’onesided’ : frequency range of the spectrum is from zero
+     up to but not including sample_f/2.  Power from negative
+     frequencies is added to the positive side of the spectrum.
+     ’whole’, ’twosided’ : frequency range of the spectrum is
+     -sample_f/2 to sample_f/2, with negative frequencies stored in
+     "wrap around" order after the positive frequencies; e.g.
+     frequencies for a 10-point ’twosided’ spectrum are 0 0.1 0.2 0.3
+     0.4 0.5 -0.4 -0.3 -0.2 -0.1 ’shift’, ’centerdc’ : same as ’whole’
+     but with the first half of the spectrum swapped with second half to
+     put the zero-frequency value in the middle.  (See "help fftshift".
+     If "freq" is vector, ’shift’ is ignored.  If model coefficients
+     "ar_coeffs" are real, the default range is ’half’, otherwise
+     default range is ’whole’.
+
+     Method:
+
+     ’fft’: use FFT to calculate power spectrum.  ’poly’: calculate
+     power spectrum as a polynomial of 1/z N.B. this argument is ignored
+     if the "freq" argument is a vector.  The default is ’poly’ unless
+     the "freq" argument is an integer power of 2.
+
+     Plot type:
+
+     ’plot’, ’semilogx’, ’semilogy’, ’loglog’, ’squared’ or ’db’:
+     specifies the type of plot.  The default is ’plot’, which means
+     linear-linear axes.  ’squared’ is the same as ’plot’.  ’dB’ plots
+     "10*log10(psd)".  This argument is ignored and a spectrum is not
+     plotted if the caller requires a returned value.
+
+     RETURNED VALUES: If returned values are not required by the caller,
+     the spectrum is plotted and nothing is returned.
+        • PSD estimate of power-spectral density
+        • F_OUT frequency values
+
+     REFERENCE [1] Equation 2.28 from Steven M. Kay and Stanley Lawrence
+     Marple Jr.: "Spectrum analysis – a modern perspective", Proceedings
+     of the IEEE, Vol 69, pp 1380-1419, Nov., 1981
+
+3.10.3 cohere
+-------------
+
+ -- Function File: [PXX, FREQ] =
+          cohere(X,Y,NFFT,FS,WINDOW,OVERLAP,RANGE,PLOT_TYPE,DETREND)
+     Estimate (mean square) coherence of signals "x" and "y".
+
+     Use the Welch (1967) periodogram/FFT method.
+
+     Compatible with Matlab R11 cohere and earlier.
+
+     See "help pwelch" for description of arguments, hints and
+     references — especially hint (7) for Matlab R11 defaults.
+
+3.10.4 cpsd
+-----------
+
+ -- Function File: [PXX, FREQ] = cpsd (X, Y)
+ -- Function File: [...] = cpsd (X, Y, WINDOW)
+ -- Function File: [...] = cpsd (X, Y, WINDOW, OVERLAP)
+ -- Function File: [...] = cpsd (X, Y, WINDOW, OVERLAP, NFFT)
+ -- Function File: [...] = cpsd (X, Y, WINDOW, OVERLAP, NFFT, FS)
+ -- Function File: [...] = cpsd (X, Y, WINDOW, OVERLAP, NFFT, FS, RANGE)
+ -- Function File: cpsd (...)
+
+     Estimate cross power spectrum of data X and Y by the Welch (1967)
+     periodogram/FFT method.
+
+     See also: pwelch.
+
+3.10.5 csd
+----------
+
+ -- Function File: [PXX,FREQ] = csd(X, Y, NFFT, FS, WINDOW, OVERLAP,
+          RANGE, PLOT_TYPE, DETREND)
+     Estimate cross power spectrum of data "x" and "y" by the Welch
+     (1967) periodogram/FFT method.
+
+     Compatible with Matlab R11 csd and earlier.
+
+     See "help pwelch" for description of arguments, hints and
+     references — especially hint (7) for Matlab R11 defaults.
+
+3.10.6 db2pow
+-------------
+
+ -- Function File: db2pow (X)
+     Convert decibels (dB) to power.
+
+     The power of X is defined as P = ‘10 ^ (x/10)’.
+
+     If X is a vector, matrix, or N-dimensional array, the power is
+     computed over the elements of X.
+
+     Example:
+
+           db2pow ([-10, 0, 10])
+          ⇒ 0.1000 1.0000 10.0000
+
+     See also: pow2db.
+
+3.10.7 mscohere
+---------------
+
+ -- Function File: [PXX, FREQ] = mscohere (X, Y)
+ -- Function File: [...] = mscohere (X, Y, WINDOW)
+ -- Function File: [...] = mscohere (X, Y, WINDOW, OVERLAP)
+ -- Function File: [...] = mscohere (X, Y, WINDOW, OVERLAP, NFFT)
+ -- Function File: [...] = mscohere (X, Y, WINDOW, OVERLAP, NFFT, FS)
+ -- Function File: [...] = mscohere (X, Y, WINDOW, OVERLAP, NFFT, FS,
+          RANGE)
+ -- Function File: mscohere (...)
+
+     Estimate (mean square) coherence of signals X and Y.  Use the Welch
+     (1967) periodogram/FFT method.
+
+     See also: pwelch.
+
+3.10.8 pburg
+------------
+
+ -- Function File: [PSD,F_OUT] = pburg(X, POLES, FREQ, FS, RANGE,
+          METHOD, PLOT_TYPE, CRITERION)
+     Calculate Burg maximum-entropy power spectral density.
+
+     The functions "arburg" and "ar_psd" do all the work.  See "help
+     arburg" and "help ar_psd" for further details.
+
+     ARGUMENTS:
+
+     All but the first two arguments are optional and may be empty.
+
+     x
+          [vector] sampled data
+     poles
+          [integer scalar] required number of poles of the AR model
+     freq
+          [real vector] frequencies at which power spectral density is
+          calculated.
+
+          [integer scalar] number of uniformly distributed frequency
+          values at which spectral density is calculated.  [default=256]
+     Fs
+          [real scalar] sampling frequency (Hertz) [default=1]
+
+     CONTROL-STRING ARGUMENTS – each of these arguments is a character
+     string.
+
+     Control-string arguments can be in any order after the other
+     arguments.
+
+     range
+          ’half’, ’onesided’ : frequency range of the spectrum is from
+          zero up to but not including sample_f/2.  Power from negative
+          frequencies is added to the positive side of the spectrum.
+
+          ’whole’, ’twosided’ : frequency range of the spectrum is
+          -sample_f/2 to sample_f/2, with negative frequencies stored in
+          "wrap around" order after the positive frequencies; e.g.
+          frequencies for a 10-point ’twosided’ spectrum are 0 0.1 0.2
+          0.3 0.4 0.5 -0.4 -0.3 -0.2 -0.1
+
+          ’shift’, ’centerdc’ : same as ’whole’ but with the first half
+          of the spectrum swapped with second half to put the
+          zero-frequency value in the middle.  (See "help fftshift".  If
+          "freq" is vector, ’shift’ is ignored.  If model coefficients
+          "ar_coeffs" are real, the default range is ’half’, otherwise
+          default range is ’whole’.
+
+     method
+          ’fft’: use FFT to calculate power spectral density.
+
+          ’poly’: calculate spectral density as a polynomial of 1/z N.B.
+          this argument is ignored if the "freq" argument is a vector.
+          The default is ’poly’ unless the "freq" argument is an integer
+          power of 2.
+
+     plot_type
+          ’plot’, ’semilogx’, ’semilogy’, ’loglog’, ’squared’ or ’db’:
+          specifies the type of plot.  The default is ’plot’, which
+          means linear-linear axes.  ’squared’ is the same as ’plot’.
+          ’dB’ plots "10*log10(psd)".  This argument is ignored and a
+          spectrum is not plotted if the caller requires a returned
+          value.
+
+     criterion
+          [optional string arg] model-selection criterion.  Limits the
+          number of poles so that spurious poles are not added when the
+          whitened data has no more information in it (see Kay & Marple,
+          1981).  Recognized values are
+
+          ’AKICc’ – approximate corrected Kullback information criterion
+          (recommended),
+
+          ’KIC’ – Kullback information criterion
+
+          ’AICc’ – corrected Akaike information criterion
+
+          ’AIC’ – Akaike information criterion
+
+          ’FPE’ – final prediction error" criterion
+
+          The default is to NOT use a model-selection criterion
+
+     RETURNED VALUES:
+
+     If return values are not required by the caller, the spectrum is
+     plotted and nothing is returned.
+
+     psd
+          [real vector] power-spectral density estimate
+     f_out
+          [real vector] frequency values
+
+     HINTS
+
+     This function is a wrapper for arburg and ar_psd.
+
+     See "help arburg", "help ar_psd".
+
+3.10.9 pow2db
+-------------
+
+ -- Function File: pow2db (X)
+     Convert power to decibels (dB).
+
+     The decibel value of X is defined as D = ‘10 * log10 (x)’.
+
+     If X is a vector, matrix, or N-dimensional array, the decibel value
+     is computed over the elements of X.
+
+     Examples:
+
+           pow2db ([0, 10, 100])
+          ⇒ -Inf 10 20
+
+     See also: db2pow.
+
+3.10.10 pwelch
+--------------
+
+ -- Function File: [SPECTRA,FREQ] = pwelch(X, WINDOW, OVERLAP, NFFT, FS,
+          RANGE, PLOT_TYPE, DETREND, SLOPPY)
+     Estimate power spectral density of data "x" by the Welch (1967)
+     periodogram/FFT method.
+
+     All arguments except "x" are optional.
+
+     The data is divided into segments.  If "window" is a vector, each
+     segment has the same length as "window" and is multiplied by
+     "window" before (optional) zero-padding and calculation of its
+     periodogram.  If "window" is a scalar, each segment has a length of
+     "window" and a Hamming window is used.
+
+     The spectral density is the mean of the periodograms, scaled so
+     that area under the spectrum is the same as the mean square of the
+     data.  This equivalence is supposed to be exact, but in practice
+     there is a mismatch of up to 0.5% when comparing area under a
+     periodogram with the mean square of the data.
+
+     [spectra,freq] = pwelch(x,y,window,overlap,Nfft,Fs,
+     range,plot_type,detrend,sloppy,results)
+
+     Two-channel spectrum analyser.  Estimate power spectral density,
+     cross- spectral density, transfer function and/or coherence
+     functions of time- series input data "x" and output data "y" by the
+     Welch (1967) periodogram/FFT method.
+
+     pwelch treats the second argument as "y" if there is a
+     control-string argument "cross", "trans", "coher" or "ypower";
+     "power" does not force the 2nd argument to be treated as "y".  All
+     other arguments are optional.  All spectra are returned in matrix
+     "spectra".
+
+     [spectra,Pxx_ci,freq] = pwelch(x,window,overlap,Nfft,Fs,conf,
+     range,plot_type,detrend,sloppy)
+
+     [spectra,Pxx_ci,freq] = pwelch(x,y,window,overlap,Nfft,Fs,conf,
+     range,plot_type,detrend,sloppy,results)
+
+     Estimates confidence intervals for the spectral density.
+
+     See Hint (7) below for compatibility options.
+
+     Confidence level "conf" is the 6th or 7th numeric argument.  If
+     "results" control-string arguments are used, one of them must be
+     "power" when the "conf" argument is present; pwelch can estimate
+     confidence intervals only for the power spectrum of the "x" data.
+     It does not know how to estimate confidence intervals of the
+     cross-power spectrum, transfer function or coherence; if you can
+     suggest a good method, please send a bug report.
+
+     ARGUMENTS
+
+     All but the first argument are optional and may be empty, except
+     that the "results" argument may require the second argument to be
+     "y".
+     x
+          [non-empty vector] system-input time-series data
+     y
+          [non-empty vector] system-output time-series data
+     window
+          [real vector] of window-function values between 0 and 1; the
+          data segment has the same length as the window.  Default
+          window shape is Hamming.
+
+          [integer scalar] length of each data segment.  The default
+          value is window=sqrt(length(x)) rounded up to the nearest
+          integer power of 2; see ’sloppy’ argument.
+
+     overlap
+          [real scalar] segment overlap expressed as a multiple of
+          window or segment length.  0 <= overlap < 1, The default is
+          overlap=0.5 .
+
+     Nfft
+          [integer scalar] Length of FFT. The default is the length of
+          the "window" vector or has the same value as the scalar
+          "window" argument.  If Nfft is larger than the segment length,
+          "seg_len", the data segment is padded with "Nfft-seg_len"
+          zeros.  The default is no padding.  Nfft values smaller than
+          the length of the data segment (or window) are ignored
+          silently.
+
+     Fs
+          [real scalar] sampling frequency (Hertz); default=1.0
+
+     conf
+          [real scalar] confidence level between 0 and 1.  Confidence
+          intervals of the spectral density are estimated from scatter
+          in the periodograms and are returned as Pxx_ci.  Pxx_ci(:,1)
+          is the lower bound of the confidence interval and Pxx_ci(:,2)
+          is the upper bound.  If there are three return values, or conf
+          is an empty matrix, confidence intervals are calculated for
+          conf=0.95 .  If conf is zero or is not given, confidence
+          intervals are not calculated.  Confidence intervals can be
+          obtained only for the power spectral density of x; nothing
+          else.
+
+     CONTROL-STRING ARGUMENTS – each of these arguments is a character
+     string.  Control-string arguments must be after the other arguments
+     but can be in any order.
+
+     range
+          ’half’, ’onesided’ : frequency range of the spectrum is zero
+          up to but not including Fs/2.  Power from negative frequencies
+          is added to the positive side of the spectrum, but not at zero
+          or Nyquist (Fs/2) frequencies.  This keeps power equal in time
+          and spectral domains.  See reference [2].
+
+          ’whole’, ’twosided’ : frequency range of the spectrum is -Fs/2
+          to Fs/2, with negative frequencies stored in "wrap around"
+          order after the positive frequencies; e.g.  frequencies for a
+          10-point ’twosided’ spectrum are 0 0.1 0.2 0.3 0.4 0.5 -0.4
+          -0.3 -0.2 -0.1
+
+          ’shift’, ’centerdc’ : same as ’whole’ but with the first half
+          of the spectrum swapped with second half to put the
+          zero-frequency value in the middle.  (See "help fftshift".
+
+          If data (x and y) are real, the default range is ’half’,
+          otherwise default range is ’whole’.
+
+     plot_type
+          ’plot’, ’semilogx’, ’semilogy’, ’loglog’, ’squared’ or ’db’:
+          specifies the type of plot.  The default is ’plot’, which
+          means linear-linear axes.  ’squared’ is the same as ’plot’.
+          ’dB’ plots "10*log10(psd)".  This argument is ignored and a
+          spectrum is not plotted if the caller requires a returned
+          value.
+
+     detrend
+          ’no-strip’, ’none’ – do NOT remove mean value from the data
+
+          ’short’, ’mean’ – remove the mean value of each segment from
+          each segment of the data.
+
+          ’linear’, – remove linear trend from each segment of the data.
+
+          ’long-mean’ – remove the mean value from the data before
+          splitting it into segments.  This is the default.
+
+     sloppy
+          ’sloppy’: FFT length is rounded up to the nearest integer
+          power of 2 by zero padding.  FFT length is adjusted after
+          addition of padding by explicit Nfft argument.  The default is
+          to use exactly the FFT and window/ segment lengths specified
+          in argument list.
+
+     results
+          specifies what results to return (in the order specified and
+          as many as desired).
+
+          ’power’ calculate power spectral density of "x"
+
+          ’cross’ calculate cross spectral density of "x" and "y"
+
+          ’trans’ calculate transfer function of a system with input "x"
+          and output "y"
+
+          ’coher’ calculate coherence function of "x" and "y"
+
+          ’ypower’ calculate power spectral density of "y"
+
+          The default is ’power’, with argument "y" omitted.
+
+     RETURNED VALUES:
+
+     If return values are not required by the caller, the results are
+     plotted and nothing is returned.
+
+     spectra
+          [real-or-complex matrix] columns of the matrix contain results
+          in the same order as specified by "results" arguments.  Each
+          column contains one of the result vectors.
+
+     Pxx_ci
+          [real matrix] estimate of confidence interval for power
+          spectral density of x.  First column is the lower bound.
+          Second column is the upper bound.
+
+     freq
+          [real column vector] frequency values
+
+     HINTS
+       1. EMPTY ARGS: if you don’t want to use an optional argument you
+          can leave it empty by writing its value as [].
+
+       2. FOR BEGINNERS: The profusion of arguments may make pwelch
+          difficult to use, and an unskilled user can easily produce a
+          meaningless result or can easily mis-interpret the result.
+          With real data "x" and sampling frequency "Fs", the easiest
+          and best way for a beginner to use pwelch is probably
+          "pwelch(x,[],[],[],Fs)".  Use the "window" argument to control
+          the length of the spectrum vector.  For real data and integer
+          scalar M, "pwelch(x,2*M,[],[],Fs)" gives an M+1 point
+          spectrum.  Run "demo pwelch" (octave only).
+
+       3. WINDOWING FUNCTIONS: Without a window function, sharp spectral
+          peaks can have strong sidelobes because the FFT of a data in a
+          segment is in effect convolved with a rectangular window.  A
+          window function which tapers off (gradually) at the ends
+          produces much weaker sidelobes in the FFT. Hann (hanning),
+          hamming, bartlett, blackman, flattopwin etc are available as
+          separate Matlab/sigproc or Octave functions.  The sidelobes of
+          the Hann window have a roll-off rate of 60dB/decade of
+          frequency.  The first sidelobe of the Hamming window is
+          suppressed and is about 12dB lower than the first Hann
+          sidelobe, but the roll-off rate is only 20dB/decade.  You can
+          inspect the FFT of a Hann window by plotting
+          "abs(fft(postpad(hanning(256),4096,0)))".  The default window
+          is Hamming.
+
+       4. ZERO PADDING: Zero-padding reduces the frequency step in the
+          spectrum, and produces an artificially smoothed spectrum.  For
+          example, "Nfft=2*length(window)" gives twice as many frequency
+          values, but adjacent PSD (power spectral density) values are
+          not independent; adjacent PSD values are independent if
+          "Nfft=length(window)", which is the default value of Nfft.
+
+       5. REMOVING MEAN FROM SIGNAL: If the mean is not removed from the
+          signal there is a large spectral peak at zero frequency and
+          the sidelobes of this peak are likely to swamp the rest of the
+          spectrum.  For this reason, the default behavior is to remove
+          the mean.  However, the matlab pwelch does not do this.
+
+       6. WARNING ON CONFIDENCE INTERVALS Confidence intervals are
+          obtained by measuring the sample variance of the periodograms
+          and assuming that the periodograms have a Gaussian probability
+          distribution.  This assumption is not accurate.  If, for
+          example, the data (x) is Gaussian, the periodogram has a
+          Rayleigh distribution.  However, the confidence intervals may
+          still be useful.
+
+       7. COMPATIBILITY WITH Matlab R11, R12, etc When used without the
+          second data (y) argument, arguments are compatible with the
+          pwelch of Matlab R12, R13, R14, 2006a and 2006b except that
+
+          1) overlap is expressed as a multiple of window length —
+          effect of overlap scales with window length
+
+          2) default values of length(window), Nfft and Fs are more
+          sensible, and
+
+          3) Goertzel algorithm is not available so Nfft cannot be an
+          array of frequencies as in Matlab 2006b.
+
+          Pwelch has four persistent Matlab-compatibility levels.
+          Calling pwelch with an empty first argument sets the order of
+          arguments and defaults specified above in the USAGE and
+          ARGUMENTS section of this documentation.
+                         prev_compat=pwelch([]);
+                         [Pxx,f]=pwelch(x,window,overlap,Nfft,Fs,conf,...);
+          Calling pwelch with a single string argument (as described
+          below) gives compatibility with Matlab R11 or R12, or the R14
+          spectrum.welch defaults.  The returned value is the PREVIOUS
+          compatibility string.
+
+          Matlab R11: For compatibility with the Matlab R11 pwelch:
+                         prev_compat=pwelch('R11-');
+                         [Pxx,f]=pwelch(x,Nfft,Fs,window,overlap,conf,range,units);
+                         %% units of overlap are "number of samples"
+                         %% defaults: Nfft=min(length(x),256), Fs=2*pi, length(window)=Nfft,
+                         %%           window=Hanning, do not detrend,
+                         %% N.B.  "Sloppy" is not available.
+
+          Matlab R12: For compatibility with Matlab R12 to 2006a pwelch:
+                         prev_compat=pwelch('R12+');
+                         [Pxx,f]=pwelch(x,window,overlap,nfft,Fs,...);
+                         %% units of overlap are "number of samples"
+                         %% defaults: length(window)==length(x)/8, window=Hamming,
+                         %%           Nfft=max(256,NextPow2), Fs=2*pi, do not detrend
+                         %% NextPow2 is the next power of 2 greater than or equal to the
+                         %% window length. "Sloppy", "conf" are not available.  Default
+                         %% window length gives very poor amplitude resolution.
+
+          To adopt defaults of the Matlab R14 "spectrum.welch" spectrum
+          object associated "psd" method.
+                         prev_compat=pwelch('psd');
+                         [Pxx,f] = pwelch(x,window,overlap,Nfft,Fs,conf,...);
+                         %% overlap is expressed as a percentage of window length,
+                         %% defaults: length(window)==64, Nfft=max(256,NextPow2), Fs=2*pi
+                         %%           do not detrend
+                         %% NextPow2 is the next power of 2 greater than or equal to the
+                         %% window length. "Sloppy" is not available.
+                         %% Default window length gives coarse frequency resolution.
+
+     REFERENCES
+
+     [1] Peter D. Welch (June 1967): "The use of fast Fourier transform
+     for the estimation of power spectra: a method based on time
+     averaging over short, modified periodograms."  IEEE Transactions on
+     Audio Electroacoustics, Vol AU-15(6), pp 70-73
+
+     [2] William H. Press and Saul A. Teukolsky and William T.
+     Vetterling and Brian P. Flannery", "Numerical recipes in C, The art
+     of scientific computing", 2nd edition, Cambridge University Press,
+     2002 — Section 13.7.
+
+3.10.11 pyulear
+---------------
+
+ -- Function File: [psd,f_out] =
+          pyulear(x,poles,freq,Fs,range,method,plot_type)
+     Calculates a Yule-Walker autoregressive (all-pole) model of the
+     data "x" and computes the power spectrum of the model.
+
+     This is a wrapper for functions "aryule" and "ar_psd" which perform
+     the argument checking.
+
+     See "help aryule" and "help ar_psd" for further details.
+
+     ARGUMENTS:
+
+     All but the first two arguments are optional and may be empty.
+     x
+          [vector] sampled data
+
+     poles
+          [integer scalar] required number of poles of the AR model
+
+     freq
+          [real vector] frequencies at which power spectral density is
+          calculated
+
+          [integer scalar] number of uniformly distributed frequency
+          values at which spectral density is calculated.  [default=256]
+
+     Fs
+          [real scalar] sampling frequency (Hertz) [default=1]
+
+     CONTROL-STRING ARGUMENTS – each of these arguments is a character
+     string.
+
+     Control-string arguments can be in any order after the other
+     arguments.
+
+     range
+          ’half’, ’onesided’ : frequency range of the spectrum is from
+          zero up to but not including sample_f/2.  Power from negative
+          frequencies is added to the positive side of the spectrum.
+
+          ’whole’, ’twosided’ : frequency range of the spectrum is
+          -sample_f/2 to sample_f/2, with negative frequencies stored in
+          "wrap around" order after the positive frequencies; e.g.
+          frequencies for a 10-point ’twosided’ spectrum are 0 0.1 0.2
+          0.3 0.4 0.5 -0.4 -0.3 -0.2 -0.1
+
+          ’shift’, ’centerdc’ : same as ’whole’ but with the first half
+          of the spectrum swapped with second half to put the
+          zero-frequency value in the middle.  (See "help fftshift".  If
+          "freq" is vector, ’shift’ is ignored.
+
+          If model coefficients "ar_coeffs" are real, the default range
+          is ’half’, otherwise default range is ’whole’.
+
+     method
+          ’fft’: use FFT to calculate power spectrum.
+
+          ’poly’: calculate power spectrum as a polynomial of 1/z N.B.
+          this argument is ignored if the "freq" argument is a vector.
+          The default is ’poly’ unless the "freq" argument is an integer
+          power of 2.
+
+     plot_type
+          ’plot’, ’semilogx’, ’semilogy’, ’loglog’, ’squared’ or ’db’:
+          specifies the type of plot.  The default is ’plot’, which
+          means linear-linear axes.  ’squared’ is the same as ’plot’.
+          ’dB’ plots "10*log10(psd)".  This argument is ignored and a
+          spectrum is not plotted if the caller requires a returned
+          value.
+
+     RETURNED VALUES:
+
+     If return values are not required by the caller, the spectrum is
+     plotted and nothing is returned.
+
+     psd
+          [real vector] power-spectrum estimate
+     f_out
+          [real vector] frequency values
+
+     HINTS
+
+     This function is a wrapper for aryule and ar_psd.
+
+     See "help aryule", "help ar_psd".
+
+3.10.12 tfe
+-----------
+
+ -- Function File: [Pxx,freq] =
+          tfe(x,y,Nfft,Fs,window,overlap,range,plot_type,detrend)
+     Estimate transfer function of system with input "x" and output "y".
+
+     Use the Welch (1967) periodogram/FFT method.
+
+     Compatible with Matlab R11 tfe and earlier.
+
+     See "help pwelch" for description of arguments, hints and
+     references — especially hint (7) for Matlab R11 defaults.
+
+3.10.13 tfestimate
+------------------
+
+ -- Function File: tfestimate (X, Y)
+ -- Function File: tfestimate (X, Y, WINDOW)
+ -- Function File: tfestimate (X, Y, WINDOW, OVERLAP)
+ -- Function File: tfestimate (X, Y, WINDOW, OVERLAP, NFFT)
+ -- Function File: tfestimate (X, Y, WINDOW, OVERLAP, NFFT, FS)
+ -- Function File: tfestimate (X, Y, WINDOW, OVERLAP, NFFT, FS, RANGE)
+ -- Function File: [PXX, FREQ] = tfestimate (...)
+
+     Estimate transfer function of system with input X and output Y.
+     Use the Welch (1967) periodogram/FFT method.
+
+     See also: pwelch.
+
+
+File: signal.info,  Node: Window Functions,  Next: System Identification,  Prev: Power Spectrum Analysis,  Up: Function Reference
+
+3.11 Window Functions
+=====================
+
+3.11.1 barthannwin
+------------------
+
+ -- Function File: barthannwin (M)
+     Return the filter coefficients of a modified Bartlett-Hann window
+     of length M.
+
+     See also: rectwin, bartlett.
+
+3.11.2 blackmanharris
+---------------------
+
+ -- Function File: blackmanharris (M)
+ -- Function File: blackmanharris (M, "periodic")
+ -- Function File: blackmanharris (M, "symmetric")
+     Return the filter coefficients of a Blackman-Harris window of
+     length M.
+
+     If the optional argument ‘"periodic"’ is given, the periodic form
+     of the window is returned.  This is equivalent to the window of
+     length M+1 with the last coefficient removed.  The optional
+     argument ‘"symmetric"’ is equivalent to not specifying a second
+     argument.
+
+     See also: rectwin, bartlett.
+
+3.11.3 blackmannuttall
+----------------------
+
+ -- Function File: blackmannuttall (M)
+ -- Function File: blackmannuttall (M, "periodic")
+ -- Function File: blackmannuttall (M, "symmetric")
+     Return the filter coefficients of a Blackman-Nuttall window of
+     length M.
+
+     If the optional argument ‘"periodic"’ is given, the periodic form
+     of the window is returned.  This is equivalent to the window of
+     length M+1 with the last coefficient removed.  The optional
+     argument ‘"symmetric"’ is equivalent to not specifying a second
+     argument.
+
+     See also: nuttallwin, kaiser.
+
+3.11.4 bohmanwin
+----------------
+
+ -- Function File: bohmanwin (M)
+     Return the filter coefficients of a Bohman window of length M.
+
+     See also: rectwin, bartlett.
+
+3.11.5 boxcar
+-------------
+
+ -- Function File: boxcar (M)
+     Return the filter coefficients of a rectangular window of length M.
+
+3.11.6 chebwin
+--------------
+
+ -- Function File: chebwin (M)
+ -- Function File: chebwin (M, AT)
+
+     Return the filter coefficients of a Dolph-Chebyshev window of
+     length M.  The Fourier transform of the window has a stop-band
+     attenuation of AT dB. The default attenuation value is 100 dB.
+
+     For the definition of the Chebyshev window, see
+
+     * Peter Lynch, "The Dolph-Chebyshev Window: A Simple Optimal
+     Filter", Monthly Weather Review, Vol.  125, pp.  655-660, April
+     1997.  (http://www.maths.tcd.ie/~plynch/Publications/Dolph.pdf)
+
+     * C. Dolph, "A current distribution for broadside arrays which
+     optimizes the relationship between beam width and side-lobe level",
+     Proc.  IEEE, 34, pp.  335-348.
+
+     The window is described in frequency domain by the expression:
+
+                    Cheb(m-1, beta * cos(pi * k/m))
+             W(k) = -------------------------------
+                           Cheb(m-1, beta)
+
+     with
+
+             beta = cosh(1/(m-1) * acosh(10^(at/20))
+
+     and Cheb(m,x) denoting the m-th order Chebyshev polynomial
+     calculated at the point x.
+
+     Note that the denominator in W(k) above is not computed, and after
+     the inverse Fourier transform the window is scaled by making its
+     maximum value unitary.
+
+     See also: kaiser.
+
+3.11.7 flattopwin
+-----------------
+
+ -- Function File: flattopwin (M)
+ -- Function File: flattopwin (M, "periodic")
+ -- Function File: flattopwin (M, "symmetric")
+
+     Return the filter coefficients of a Flat Top window of length M.
+     The Flat Top window is defined by the function f(w):
+
+             f(w) = 1 - 1.93 cos(2 pi w) + 1.29 cos(4 pi w)
+                      - 0.388 cos(6 pi w) + 0.0322cos(8 pi w)
+
+     where w = i/(m-1) for i=0:m-1 for a symmetric window, or w = i/m
+     for i=0:m-1 for a periodic window.  The default is symmetric.  The
+     returned window is normalized to a peak of 1 at w = 0.5.
+
+     This window has low pass-band ripple, but high bandwidth.
+
+     According to [1]:
+
+     The main use for the Flat Top window is for calibration, due to its
+     negligible amplitude errors.
+
+     [1] Gade, S; Herlufsen, H; (1987) "Use of weighting functions in
+     DFT/FFT analysis (Part I)", Bruel & Kjaer Technical Review No.3.
+
+3.11.8 gaussian
+---------------
+
+ -- Function File: gaussian (M)
+ -- Function File: gaussian (M, A)
+
+     Return a Gaussian convolution window of length M.  The width of the
+     window is inversely proportional to the parameter A.  Use larger A
+     for a narrower window.  Use larger M for longer tails.
+
+     w = exp ( -(a*x)^2/2 )
+
+     for x = linspace ( -(m-1)/2, (m-1)/2, m ).
+
+     Width a is measured in frequency units (sample rate/num samples).
+     It should be f when multiplying in the time domain, but 1/f when
+     multiplying in the frequency domain (for use in convolutions).
+
+3.11.9 gausswin
+---------------
+
+ -- Function File: gausswin (M)
+ -- Function File: gausswin (M, A)
+
+     Return the filter coefficients of a Gaussian window of length M.
+     The width of the window is inversely proportional to the parameter
+     A.  Use larger A for a narrow window.  Use larger M for a smoother
+     curve.
+
+     w = exp ( -(a*x)^2/2 )
+
+     for x = linspace(-(m-1)/m, (m-1)/m, m)
+
+3.11.10 hann
+------------
+
+ -- Function File: hann (M)
+ -- Function File: hann (M, "periodic")
+ -- Function File: hann (M, "symmetric")
+     Return the filter coefficients of a Hanning window of length M.
+
+     If the optional argument ‘"periodic"’ is given, the periodic form
+     of the window is returned.  This is equivalent to the window of
+     length M+1 with the last coefficient removed.  The optional
+     argument ‘"symmetric"’ is equivalent to not specifying a second
+     argument.
+
+     This function exists for MATLAB compatibility only, and is
+     equivalent to ‘hanning (M)’.
+
+     See also: hanning.
+
+3.11.11 kaiser
+--------------
+
+ -- Function File: kaiser (M)
+ -- Function File: kaiser (M, BETA)
+
+     Return the filter coefficients of a Kaiser window of length M.  The
+     Fourier transform of the window has a stop-band attenuation that is
+     derived from the parameter BETA.
+
+     For the definition of the Kaiser window, see A. V. Oppenheim & R.
+     W. Schafer, "Discrete-Time Signal Processing".
+
+     The continuous version of width m centered about x=0 is:
+
+                   besseli(0, beta * sqrt(1-(2*x/m).^2))
+           k(x) =  -------------------------------------,  m/2 <= x <= m/2
+                          besseli(0, beta)
+
+     See also: kaiserord.
+
+3.11.12 nuttallwin
+------------------
+
+ -- Function File: nuttallwin (M)
+ -- Function File: nuttallwin (M, "periodic")
+ -- Function File: nuttallwin (M, "symmetric")
+     Return the filter coefficients of a Blackman-Harris window defined
+     by Nuttall of length M.
+
+     If the optional argument ‘"periodic"’ is given, the periodic form
+     of the window is returned.  This is equivalent to the window of
+     length M+1 with the last coefficient removed.  The optional
+     argument ‘"symmetric"’ is equivalent to not specifying a second
+     argument.
+
+     See also: blackman, blackmanharris.
+
+3.11.13 parzenwin
+-----------------
+
+ -- Function File: parzenwin (M)
+     Return the filter coefficients of a Parzen window of length M.
+
+     See also: rectwin, bartlett.
+
+3.11.14 rectwin
+---------------
+
+ -- Function File: rectwin (M)
+     Return the filter coefficients of a rectangular window of length M.
+
+     See also: boxcar, hamming, hanning.
+
+3.11.15 triang
+--------------
+
+ -- Function File: triang (M)
+
+     Return the filter coefficients of a triangular window of length M.
+     Unlike the Bartlett window, ‘triang’ does not go to zero at the
+     edges of the window.  For odd M, ‘triang (M)’ is equal to ‘bartlett
+     (M + 2)’ except for the zeros at the edges of the window.
+
+     See also: bartlett.
+
+3.11.16 tukeywin
+----------------
+
+ -- Function File: tukeywin (M)
+ -- Function File: tukeywin (M, R)
+     Return the filter coefficients of a Tukey window (also known as the
+     cosine-tapered window) of length M.  R defines the ratio between
+     the constant section and and the cosine section.  It has to be
+     between 0 and 1.  The function returns a Hanning window for R equal
+     to 1 and a rectangular window for R equal to 0.  The default value
+     of R is 1/2.
+
+     For a definition of the Tukey window, see e.g.  Fredric J. Harris,
+     "On the Use of Windows for Harmonic Analysis with the Discrete
+     Fourier Transform, Proceedings of the IEEE", Vol.  66, No.  1,
+     January 1978, Page 67, Equation 38.
+
+     See also: hanning.
+
+3.11.17 ultrwin
+---------------
+
+ -- Function File: [W, XMU] = ultrwin (M, MU, BETA)
+ -- Function File: [W, XMU] = ultrwin (M, MU, ATT, "att")
+ -- Function File: [W, XMU] = ultrwin (M, MU, LATT, "latt")
+ -- Function File: W = ultrwin (M, MU, XMU, "xmu")
+     Return the coefficients of an Ultraspherical window of length M.
+     The parameter MU controls the window’s Fourier transform’s
+     side-lobe to side-lobe ratio, and the third given parameter
+     controls the transform’s main-lobe width/side-lobe-ratio; normalize
+     W such that the central coefficient(s) value is unitary.
+
+     By default, the third parameter is BETA, which sets the main lobe
+     width to BETA times that of a rectangular window.  Alternatively,
+     giving ATT or LATT sets the ripple ratio at the first or last
+     side-lobe respectively, or giving XMU sets the (un-normalized)
+     window’s Fourier transform according to its canonical definition:
+
+                   (MU)
+           W(k) = C   [ XMU cos(pi k/M) ],  k = 0, 1, ..., M-1,
+                   M-1
+
+     where C is the Ultraspherical (a.k.a.  Gegenbauer) polynomial,
+     which can be defined using the recurrence relationship:
+
+            (l)    1                  (l)                    (l)
+           C (x) = - [ 2x(m + l - 1) C   (x) - (m + 2l - 2) C   (x) ]
+            m      m                  m-1                    m-2
+     
+                                      (l)        (l)
+           for m an integer > 1, and C (x) = 1, C (x) = 2lx.
+                                      0          1
+
+     For given BETA, ATT, or LATT, the corresponding (determined) value
+     of XMU is also returned.
+
+     The Dolph-Chebyshev and Saramaki windows are special cases of the
+     Ultraspherical window, with MU set to 0 and 1 respectively.  Note
+     that when not giving XMU, stability issues may occur with MU <=
+     -1.5.  For further information about the window, see
+
+        • Kabal, P., 2009: Time Windows for Linear Prediction of Speech.
+          Technical Report, Dept.  Elec.  & Comp.  Eng., McGill
+          University.
+        • Bergen, S., Antoniou, A., 2004: Design of Ultraspherical
+          Window Functions with Prescribed Spectral Characteristics.
+          Proc.  JASP, 13/13, pp.  2053-2065.
+        • Streit, R., 1984: A two-parameter family of weights for
+          nonrecursive digital filters and antennas.  Trans.  ASSP, 32,
+          pp.  108-118.
+
+     See also: chebwin, kaiser.
+
+3.11.18 welchwin
+----------------
+
+ -- Function File: welchwin (M)
+ -- Function File: welchwin (M, "periodic")
+ -- Function File: welchwin (M, "symmetric")
+     Return the filter coefficients of a Welch window of length M.  The
+     Welch window is given by W(n)=1-(n/N-1)^2, n=[0,1, ...  M-1].  The
+     optional argument specifies a "symmetric" window (the default) or a
+     "periodic" window.
+
+     A symmetric window has zero at each end and maximum in the middle,
+     and the length must be an integer greater than 2.  The variable N
+     in the formula above is ‘(M-1)/2’.
+
+     A periodic window wraps around the cyclic interval [0,1, ...  M-1],
+     and is intended for use with the DFT. The length must be an integer
+     greater than 1.  The variable N in the formula above is ‘M/2’.
+
+     See also: blackman, kaiser.
+
+3.11.19 window
+--------------
+
+ -- Function File: W = window (F, M)
+ -- Function File: W = window (F, M, OPTS)
+     Create an M-point window from the function F.  The function F can
+     be for example ‘@blackman’.  Any additional arguments OPT are
+     passed to the windowing function.
+
+
+File: signal.info,  Node: System Identification,  Next: Sample Rate Change,  Prev: Window Functions,  Up: Function Reference
+
+3.12 System Identification
+==========================
+
+3.12.1 arburg
+-------------
+
+ -- Function File: [A, V, K] = arburg (X, POLES)
+ -- Function File: [A, V, K] = arburg (X, POLES, CRITERION)
+
+     Calculate coefficients of an autoregressive (AR) model of complex
+     data X using the whitening lattice-filter method of Burg (1968).
+     The inverse of the model is a moving-average filter which reduces X
+     to white noise.  The power spectrum of the AR model is an estimate
+     of the maximum entropy power spectrum of the data.  The function
+     ‘ar_psd’ calculates the power spectrum of the AR model.
+
+     ARGUMENTS:
+        • X sampled data
+        • POLES number of poles in the AR model or limit to the number
+          of poles if a valid CRITERION is provided.
+        • CRITERION model-selection criterion.  Limits the number of
+          poles so that spurious poles are not added when the whitened
+          data has no more information in it (see Kay & Marple, 1981).
+          Recognized values are ’AKICc’ – approximate corrected Kullback
+          information criterion (recommended), ’KIC’ – Kullback
+          information criterion ’AICc’ – corrected Akaike information
+          criterion ’AIC’ – Akaike information criterion ’FPE’ – final
+          prediction error" criterion The default is to NOT use a
+          model-selection criterion
+
+     RETURNED VALUES:
+        • A list of (P+1) autoregression coefficients; for data input
+          x(n) and white noise e(n), the model is
+
+                                      P+1
+                x(n) = sqrt(v).e(n) + SUM a(k).x(n-k)
+                                      k=1
+
+          V mean square of residual noise from the whitening operation
+          of the Burg lattice filter.
+        • K reflection coefficients defining the lattice-filter
+          embodiment of the model
+
+     HINTS:
+
+     (1) arburg does not remove the mean from the data.  You should
+     remove the mean from the data if you want a power spectrum.  A
+     non-zero mean can produce large errors in a power-spectrum
+     estimate.  See "help detrend".  (2) If you don’t know what the
+     value of "poles" should be, choose the largest (reasonable) value
+     you could want and use the recommended value, criterion=’AKICc’, so
+     that arburg can find it.  E.g.  arburg(x,64,’AKICc’) The AKICc has
+     the least bias and best resolution of the available model-selection
+     criteria.  (3) Autoregressive and moving-average filters are stored
+     as polynomials which, in matlab, are row vectors.
+
+     NOTE ON SELECTION CRITERION:
+
+     AIC, AICc, KIC and AKICc are based on information theory.  They
+     attempt to balance the complexity (or length) of the model against
+     how well the model fits the data.  AIC and KIC are biased estimates
+     of the asymmetric and the symmetric Kullback-Leibler divergence
+     respectively.  AICc and AKICc attempt to correct the bias.  See
+     reference [4].
+
+     REFERENCES:
+
+     [1] John Parker Burg (1968) "A new analysis technique for time
+     series data", NATO advanced study Institute on Signal Processing
+     with Emphasis on Underwater Acoustics, Enschede, Netherlands, Aug.
+     12-23, 1968.
+
+     [2] Steven M. Kay and Stanley Lawrence Marple Jr.: "Spectrum
+     analysis – a modern perspective", Proceedings of the IEEE, Vol 69,
+     pp 1380-1419, Nov., 1981
+
+     [3] William H. Press and Saul A. Teukolsky and William T.
+     Vetterling and Brian P. Flannery "Numerical recipes in C, The art
+     of scientific computing", 2nd edition, Cambridge University Press,
+     2002 — Section 13.7.
+
+     [4] Abd-Krim Seghouane and Maiza Bekara "A small sample model
+     selection criterion based on Kullback’s symmetric divergence", IEEE
+     Transactions on Signal Processing, Vol.  52(12), pp 3314-3323, Dec.
+     2004
+
+     See also: ar_psd.
+
+3.12.2 aryule
+-------------
+
+ -- Function File: A = aryule (X, P)
+ -- Function File: [A, V, K] = aryule (X, P)
+     Fit an AR (P)-model with Yule-Walker estimates.
+     X
+          data vector to estimate
+     A
+          AR coefficients
+     V
+          variance of white noise
+     K
+          reflection coefficients for use in lattice filter
+
+     The power spectrum of the resulting filter can be plotted with
+     pyulear(x, p), or you can plot it directly with ar_psd(a,v,...).
+
+     See also: pyulear, power, freqz, impz – for observing
+     characteristics of the model arburg – for alternative spectral
+     estimators
+
+     Example: Use example from arburg, but substitute aryule for arburg.
+
+     Note: Orphanidis ’85 claims lattice filters are more tolerant of
+     truncation errors, which is why you might want to use them.
+     However, lacking a lattice filter processor, I haven’t tested that
+     the lattice filter coefficients are reasonable.
+
+3.12.3 invfreq
+--------------
+
+ -- Function File: [B,A] = invfreq(H,F,nB,nA)
+ -- : [B,A] = invfreq(H,F,nB,nA,W)
+ -- : [B,A] = invfreq(H,F,nB,nA,W,[],[],plane)
+ -- : [B,A] = invfreq(H,F,nB,nA,W,iter,tol,plane)
+     Fit filter B(z)/A(z) or B(s)/A(s) to complex frequency response at
+     frequency points F.
+
+     A and B are real polynomial coefficients of order nA and nB
+     respectively.  Optionally, the fit-errors can be weighted vs
+     frequency according to the weights W. Also, the transform plane can
+     be specified as either ’s’ for continuous time or ’z’ for discrete
+     time.  ’z’ is chosen by default.  Eventually, Steiglitz-McBride
+     iterations will be specified by iter and tol.
+
+     H: desired complex frequency response It is assumed that A and B
+     are real polynomials, hence H is one-sided.
+
+     F: vector of frequency samples in radians
+
+     nA: order of denominator polynomial A
+
+     nB: order of numerator polynomial B
+
+     plane=’z’: F on unit circle (discrete-time spectra, z-plane design)
+
+     plane=’s’: F on jw axis (continuous-time spectra, s-plane design)
+
+     H(k) = spectral samples of filter frequency response at points zk,
+     where zk=exp(sqrt(-1)*F(k)) when plane=’z’ (F(k) in [0,.5]) and
+     zk=(sqrt(-1)*F(k)) when plane=’s’ (F(k) nonnegative)
+
+     Example:
+               [B,A] = butter(12,1/4);
+               [H,w] = freqz(B,A,128);
+               [Bh,Ah] = invfreq(H,F,4,4);
+               Hh = freqz(Bh,Ah);
+               disp(sprintf('||frequency response error|| = %f',norm(H-Hh)));
+
+     References:
+
+     J. O. Smith, "Techniques for Digital Filter Design and System
+     Identification with Application to the Violin, Ph.D. Dissertation,
+     Elec.  Eng.  Dept., Stanford University, June 1983, page 50; or,
+
+     http://ccrma.stanford.edu/~jos/filters/FFT_Based_Equation_Error_Method.html
+
+3.12.4 invfreqs
+---------------
+
+ -- Function File: [B,A] = invfreqs(H,F,nB,nA)
+ -- : [B,A] = invfreqs(H,F,nB,nA,W)
+ -- : [B,A] = invfreqs(H,F,nB,nA,W,iter,tol,'trace')
+     Fit filter B(s)/A(s)to the complex frequency response H at
+     frequency points F.
+
+     A and B are real polynomial coefficients of order nA and nB.
+
+     Optionally, the fit-errors can be weighted vs frequency according
+     to the weights W.
+
+     Note: all the guts are in invfreq.m
+
+     H: desired complex frequency response
+
+     F: frequency (must be same length as H)
+
+     nA: order of the denominator polynomial A
+
+     nB: order of the numerator polynomial B
+
+     W: vector of weights (must be same length as F)
+
+     Example:
+                 B = [1/2 1];
+                 A = [1 1];
+                 w = linspace(0,4,128);
+                 H = freqs(B,A,w);
+                 [Bh,Ah] = invfreqs(H,w,1,1);
+                 Hh = freqs(Bh,Ah,w);
+                 plot(w,[abs(H);abs(Hh)])
+                 legend('Original','Measured');
+                 err = norm(H-Hh);
+                 disp(sprintf('L2 norm of frequency response error = %f',err));
+
+3.12.5 invfreqz
+---------------
+
+ -- Function File: [B,A] = invfreqz(H,F,nB,nA)
+ -- : [B,A] = invfreqz(H,F,nB,nA,W)
+ -- : [B,A] = invfreqz(H,F,nB,nA,W,iter,tol,'trace')
+     Fit filter B(z)/A(z)to the complex frequency response H at
+     frequency points F.
+
+     A and B are real polynomial coefficients of order nA and nB.
+     Optionally, the fit-errors can be weighted vs frequency according
+     to the weights W.
+
+     Note: all the guts are in invfreq.m
+
+     H: desired complex frequency response
+
+     F: normalized frequency (0 to pi) (must be same length as H)
+
+     nA: order of the denominator polynomial A
+
+     nB: order of the numerator polynomial B
+
+     W: vector of weights (must be same length as F)
+
+     Example:
+               [B,A] = butter(4,1/4);
+               [H,F] = freqz(B,A);
+               [Bh,Ah] = invfreq(H,F,4,4);
+               Hh = freqz(Bh,Ah);
+               disp(sprintf('||frequency response error|| = %f',norm(H-Hh)));
+
+3.12.6 levinson
+---------------
+
+ -- Function File: [A, V, REF] = levinson (ACF)
+ -- Function File: [...] = levinson (ACF, P)
+
+     Use the Durbin-Levinson algorithm to solve: toeplitz(acf(1:p)) * x
+     = -acf(2:p+1).  The solution [1, x’] is the denominator of an all
+     pole filter approximation to the signal x which generated the
+     autocorrelation function acf.
+
+     acf is the autocorrelation function for lags 0 to p.  p defaults to
+     length(acf)-1.  Returns a=[1, x’] the denominator filter
+     coefficients.  v= variance of the white noise = square of the
+     numerator constant ref = reflection coefficients = coefficients of
+     the lattice implementation of the filter Use freqz(sqrt(v),a) to
+     plot the power spectrum.
+
+     REFERENCE [1] Steven M. Kay and Stanley Lawrence Marple Jr.:
+     "Spectrum analysis – a modern perspective", Proceedings of the
+     IEEE, Vol 69, pp 1380-1419, Nov., 1981
+
+3.12.7 lpc
+----------
+
+ -- Function File: A = lpc (X)
+ -- Function File: A = lpc (X, P)
+ -- Function File: [A, G] = lpc (...)
+ -- Function File: [A, G] = lpc (X, P)
+
+     Determines the forward linear predictor by minimizing the
+     prediction error in the least squares sense.  Use the
+     Durbin-Levinson algorithm to solve the Yule-Walker equations
+     obtained by the autocorrelation of the input signal.
+
+     X is a data vector used to estimate the lpc model of P-th order,
+     given by the prediction polynomial ‘A = [1 A(2) ... A(P+1)]’.  If P
+     is not provided, ‘length(P) - 1’ is used as default.
+
+     X might also be a matrix, in which case each column is regarded as
+     a separate signal.  ‘lpc’ will return a model estimate for each
+     column of X.
+
+     G is the variance (power) of the prediction error for each signal
+     in X.
+
+     See also: aryule,levinson.
+
+
+File: signal.info,  Node: Sample Rate Change,  Next: Pulse Metrics,  Prev: System Identification,  Up: Function Reference
+
+3.13 Sample Rate Change
+=======================
+
+3.13.1 data2fun
+---------------
+
+ -- Function File: [FHANDLE, FULLNAME] = data2fun (TI, YI)
+ -- Function File: [...] = data2fun (..., PROPERTY, VALUE)
+     Create a vectorized function based on data samples using
+     interpolation.
+
+     The values given in YI (N-by-k matrix) correspond to evaluations of
+     the function y(t) at the points TI (N-by-1 matrix).  The data is
+     interpolated and the function handle to the generated interpolant
+     is returned.
+
+     The function accepts PROPERTY-VALUE pairs described below.
+
+     ‘file’
+          Code is generated and .m file is created.  The VALUE contains
+          the name of the function.  The returned function handle is a
+          handle to that file.  If VALUE is empty, then a name is
+          automatically generated using ‘tempname’ and the file is
+          created in the current directory.  VALUE must not have an
+          extension, since .m will be appended.  Numerical values used
+          in the function are stored in a .mat file with the same name
+          as the function.
+
+     ‘interp’
+          Type of interpolation.  See ‘interp1’.
+
+     See also: interp1.
+
+3.13.2 decimate
+---------------
+
+ -- Function File: Y = decimate (X, Q)
+ -- Function File: Y = decimate (X, Q, N)
+ -- Function File: Y = decimate (..., "fir")
+
+     Downsample the signal X by a reduction factor of Q.  A lowpass
+     antialiasing filter is applied to the signal prior to reducing the
+     input sequence.  By default, an order N Chebyshev type I filter is
+     used.  If N is not specified, the default is 8.
+
+     If the optional argument ‘"fir"’ is given, an order N FIR filter is
+     used, with a default order of 30 if N is not given.
+
+     Note that Q must be an integer for this rate change method.
+
+     Example:
+           ## Generate a signal that starts away from zero, is slowly varying
+           ## at the start and quickly varying at the end, decimate and plot.
+           ## Since it starts away from zero, you will see the boundary
+           ## effects of the antialiasing filter clearly.  Next you will see
+           ## how it follows the curve nicely in the slowly varying early
+           ## part of the signal, but averages the curve in the quickly
+           ## varying late part of the signal.
+           t = 0:0.01:2;
+           x = chirp (t, 2, .5, 10, "quadratic") + sin (2*pi*t*0.4);
+           y = decimate (x, 4);
+           stem (t(1:121) * 1000, x(1:121), "-g;Original;"); hold on; # original
+           stem (t(1:4:121) * 1000, y(1:31), "-r;Decimated;"); hold off; # decimated
+
+3.13.3 downsample
+-----------------
+
+ -- Function File: Y = downsample (X, N)
+ -- Function File: Y = downsample (X, N, OFFSET)
+     Downsample the signal, selecting every Nth element.  If X is a
+     matrix, downsample every column.
+
+     For most signals you will want to use ‘decimate’ instead since it
+     prefilters the high frequency components of the signal and avoids
+     aliasing effects.
+
+     If OFFSET is defined, select every Nth element starting at sample
+     OFFSET.
+
+     See also: decimate, interp, resample, upfirdn, upsample.
+
+3.13.4 interp
+-------------
+
+ -- Function File: Y = interp (X, Q)
+ -- Function File: Y = interp (X, Q, N)
+ -- Function File: Y = interp (X, Q, N, WC)
+
+     Upsample the signal x by a factor of q, using an order 2*q*n+1 FIR
+     filter.  Note that q must be an integer for this rate change
+     method.  n defaults to 4 and Wc defaults to 0.5.
+
+     Example
+           # Generate a signal.
+           t=0:0.01:2; x=chirp(t,2,.5,10,'quadratic')+sin(2*pi*t*0.4);
+           y = interp(x(1:4:length(x)),4,4,1);   # interpolate a sub-sample
+           stem(t(1:121)*1000,x(1:121),"-g;Original;"); hold on;
+           stem(t(1:121)*1000,y(1:121),"-r;Interpolated;");
+           stem(t(1:4:121)*1000,x(1:4:121),"-b;Subsampled;"); hold off;
+
+     See also: decimate, resample.
+
+3.13.5 resample
+---------------
+
+ -- Function File: [Y, H] = resample (X, P, Q)
+ -- Function File: Y = resample (X, P, Q, H)
+     Change the sample rate of X by a factor of P/Q.  This is performed
+     using a polyphase algorithm.  The impulse response H of the
+     antialiasing filter is either specified or either designed with a
+     Kaiser-windowed sinecard.
+
+     Ref [1] J. G. Proakis and D. G. Manolakis, Digital Signal
+     Processing: Principles, Algorithms, and Applications, 4th ed.,
+     Prentice Hall, 2007.  Chap.  6
+
+     Ref [2] A. V. Oppenheim, R. W. Schafer and J. R. Buck,
+     Discrete-time signal processing, Signal processing series,
+     Prentice-Hall, 1999
+
+3.13.6 upfirdn
+--------------
+
+ -- Loadable Function: Y = upfirdn (X, H, P, Q)
+     Upsample, FIR filtering, and downsample.
+
+3.13.7 upsample
+---------------
+
+ -- Function File: Y = upsample (X, N)
+ -- Function File: Y = upsample (X, N, OFFSET)
+     Upsample the signal, inserting N-1 zeros between every element.
+
+     If X is a matrix, upsample every column.
+
+     If OFFSET is specified, control the position of the inserted sample
+     in the block of N zeros.
+
+     See also: decimate, downsample, interp, resample, upfirdn.
+
+
+File: signal.info,  Node: Pulse Metrics,  Next: Utility,  Prev: Sample Rate Change,  Up: Function Reference
+
+3.14 Pulse Metrics
+==================
+
+3.14.1 statelevels
+------------------
+
+ -- Function File: LEVELS = statelevels (A)
+ -- Function File: LEVELS = statelevels (A, NBINS)
+ -- Function File: LEVELS = statelevels (A, NBINS, METHOD)
+ -- Function File: LEVELS = statelevels (A, NBINS, METHOD, BOUNDS)
+ -- Function File: [LEVELS, HISTOGRAMS] = statelevels (...)
+ -- Function File: [LEVELS, HISTOGRAMS, BINLEVELS] = statelevels (...)
+ -- Function File: statelevels (...)
+     Estimate state-level for bilevel waveform A using histogram method
+
+     INPUTS:
+
+     A
+          Bylevel waveform
+     NBINS
+          Number of histogram bins (100 default)
+     METHOD
+          State-level estimation method ’mode’ (default) or ’mean’.
+     BOUNDS
+          2 element vector for histogram lower and upper bounds.  Values
+          outside of this will be ignored.
+
+     OUTPUTS:
+
+     LEVELS
+          Levels of high and low states
+     HISTOGRAMS
+          Histogram counts
+     BINLEVELS
+          Histogram bincenters
+
+     If no outputs are provided, the signal and histogram will be
+     plotted, and display the levels.
+
+
+File: signal.info,  Node: Utility,  Prev: Pulse Metrics,  Up: Function Reference
+
+3.15 Utility
+============
+
+3.15.1 buffer
+-------------
+
+ -- Function File: Y = buffer (X, N, P, OPT)
+ -- Function File: [Y, Z, OPT] = buffer (...)
+     Buffer a signal into a data frame.  The arguments to ‘buffer’ are
+
+     X
+          The data to be buffered.
+
+     N
+          The number of rows in the produced data buffer.  This is an
+          positive integer value and must be supplied.
+
+     P
+          An integer less than N that specifies the under- or overlap
+          between column in the data frame.  The default value of P is
+          0.
+
+     OPT
+          In the case of an overlap, OPT can be either a vector of
+          length P or the string ’nodelay’.  If OPT is a vector, then
+          the first P entries in Y will be filled with these values.  If
+          OPT is the string ’nodelay’, then the first value of Y
+          corresponds to the first value of X.
+
+          In the can of an underlap, OPT must be an integer between 0
+          and ‘-P’.  The represents the initial underlap of the first
+          column of Y.
+
+          The default value for OPT the vector ‘zeros (1, P)’ in the
+          case of an overlap, or 0 otherwise.
+
+     In the case of a single output argument, Y will be padded with
+     zeros to fill the missing values in the data frame.  With two
+     output arguments Z is the remaining data that has not been used in
+     the current data frame.
+
+     Likewise, the output OPT is the overlap, or underlap that might be
+     used for a future call to ‘code’ to allow continuous buffering.
+
+3.15.2 clustersegment
+---------------------
+
+ -- Function File: CLUSTERIDX = clustersegment (UNOS)
+     Calculate boundary indexes of clusters of 1’s.
+
+     The function calculates the initial index and end index of the
+     sequences of 1’s in the rows of UNOS.  The clusters are sought in
+     the rows of the array UNOS.
+
+     The result is returned in a cell array of size 1-by-NP, where NP is
+     the number of rows in UNOS.  Each element of the cell has two rows.
+     The first row is the initial index of a sequence of 1’s and the
+     second row is the end index of that sequence.
+
+     If NP == 1 the output is a matrix with two rows.
+
+     The function works by finding the indexes of jumps between
+     consecutive values in the rows of UNOS.
+
+3.15.3 fracshift
+----------------
+
+ -- Function File: [Y, H] = fracshift (X, D)
+ -- Function File: Y = fracshift (X, D, H)
+     Shift the series X by a (possibly fractional) number of samples D.
+     The interpolator H is either specified or either designed with a
+     Kaiser-windowed sinecard.
+
+     See also: circshift.
+
+3.15.4 marcumq
+--------------
+
+ -- Function File: Q = marcumq (A, B)
+ -- Function File: Q = marcumq (A, B, M)
+ -- Function File: Q = marcumq (A, B, M, TOL)
+
+     Compute the generalized Marcum Q function of order M with
+     noncentrality parameter A and argument B.  If the order M is
+     omitted it defaults to 1.  An optional relative tolerance TOL may
+     be included, the default is ‘eps’.
+
+     If the input arguments are commensurate vectors, this function will
+     produce a table of values.
+
+     This function computes Marcum’s Q function using the infinite
+     Bessel series, truncated when the relative error is less than the
+     specified tolerance.  The accuracy is limited by that of the Bessel
+     functions, so reducing the tolerance is probably not useful.
+
+     Reference: Marcum, "Tables of Q Functions", Rand Corporation.
+
+     Reference: R.T. Short, "Computation of Noncentral Chi-squared and
+     Rice Random Variables", www.phaselockedsystems.com/publications
+
+3.15.5 primitive
+----------------
+
+ -- Function File: F = primitive (F, T, F0)
+     Calculate the primitive of a function.
+
+     The function approximates the primitive (indefinite integral) of
+     the univariate function handle F with constant of integration F0.
+     The output is the primitive evaluated at the points T.  The vector
+     T must be ordered and ascending.
+
+     This function is a fancy way of calculating the cumulative sum,
+
+     ‘F = cumsum (f(t).*diff (t)([1 1:end]))’.
+
+     Example:
+           f = @(t) sin (2 * pi * 3 * t);
+           t = [0; sort(rand (100, 1))];
+           F = primitive (f, t, 0);
+           t_true = linspace (0, 1, 1e3).';
+           F_true = (1 - cos (2 * pi * 3 * t_true)) / (2 * pi * 3);
+           plot (t, F, 'o', t_true, F_true);
+
+     See also: quadgk, cumsum.
+
+3.15.6 sampled2continuous
+-------------------------
+
+ -- Function File: XT = sampled2continuous (XN, T, T)
+
+     Calculate the x(t) reconstructed from samples x[n] sampled at a
+     rate 1/T samples per unit time.
+
+     t is all the instants of time when you need x(t) from x[n]; this
+     time is relative to x[0] and not an absolute time.
+
+     This function can be used to calculate sampling rate effects on
+     aliasing, actual signal reconstruction from discrete samples.
+
+3.15.7 schtrig
+--------------
+
+ -- V =: schtrig (X,LVL,RST=1)
+ -- [V,RNG] =: schtrig (...)
+     Implements a multisignal Schmitt trigger with levels LVL.
+
+     The triger works along the first dimension of the 2-dimensional
+     array X.  It compares each column in X to the levels in LVL, when
+     the value is higher ‘max (LVL)’ the output V is high (i.e.  1);
+     when the value is below ‘min (LVL)’ the output is low (i.e.  0);
+     and when the value is between the two levels the output retains its
+     value.
+
+     The threshold levels are passed in the array LVL.  If this is a
+     scalar, the thresholds are symmetric around 0, i.e.  ‘[-lvl lvl]’.
+
+     The second output argument stores the ranges in which the output is
+     high, so the indexes RNG(1,I):RNG(2,I) point to the i-th segment of
+     1s in V.  See ‘clustersegment’ for a detailed explanation.
+
+     The function conserves the state of the trigger across calls
+     (persistent variable).  If the reset flag is active, i.e.  ‘RST==
+     true’, then the state of the trigger for all signals is set to the
+     low state (i.e.  0).
+
+     Example:
+           x = [0 0.5 1 1.5 2 1.5 1.5 1.2 1 0 0].';
+           y = schtrig (x, [1.3 1.6]);
+           disp ([x y]);
+             0.0   0
+             0.5   0
+             1.0   0
+             1.5   0
+             2.0   1
+             1.5   1
+             1.5   1
+             1.2   0
+             1.0   0
+             0.0   0
+             0.0   0
+
+     Run ‘demo schtrig’ to see further examples.
+
+     See also: clustersegment.
+
+3.15.8 upsamplefill
+-------------------
+
+ -- Function File: Y = upsamplefill (X, V)
+ -- Function File: Y = upsamplefill (..., COPY)
+     Upsamples a vector interleaving given values or copies of the
+     vector elements.
+
+     The values in the vector V are placed between the elements of X.
+
+     If the optional argument COPY is TRUE then V should be a scalar and
+     each value in X are repeat V times.
+
+     Example:
+           upsamplefill (eye (2), 2, true)
+          ⇒  1   0
+               1   0
+               1   0
+               0   1
+               0   1
+               0   1
+           upsamplefill (eye (2), [-1 -1 -1])
+          ⇒  1   0
+              -1  -1
+              -1  -1
+              -1  -1
+               0   1
+              -1  -1
+              -1  -1
+              -1  -1
+
+     See also: upsample.
+
+3.15.9 wkeep
+------------
+
+ -- Function File: Y = wkeep (X, L)
+ -- Function File: Y = wkeep (X, L, OPT)
+     Extract the elements of X of size L from the center, the right or
+     the left.
+
+3.15.10 wrev
+------------
+
+ -- Function File: Y = wrev (X)
+     Reverse the order of the element of the vector X.
+
+     See also: flipud, fliplr.
+
+3.15.11 zerocrossing
+--------------------
+
+ -- Function File: X0 = zerocrossing (X, Y)
+     Estimates the points at which a given waveform y=y(x) crosses the
+     x-axis using linear interpolation.
+
+     See also: fzero, roots.
+
+
+
+Tag Table:
+Node: Top200
+Node: Overview980
+Node: Installing and loading1202
+Node: Function Reference2312
+Node: Signals2764
+Node: Signal Measurement18367
+Node: Correlation and Convolution23311
+Node: Filtering30163
+Node: Filter Analysis35283
+Node: Filter Conversion47876
+Node: IIR Filter Design58088
+Ref: IIR Filter Design-Footnote-196181
+Ref: IIR Filter Design-Footnote-296385
+Ref: IIR Filter Design-Footnote-396652
+Node: FIR Filter Design96871
+Node: Transforms107654
+Node: Power Spectrum Analysis120708
+Node: Window Functions151062
+Node: System Identification163225
+Node: Sample Rate Change174077
+Node: Pulse Metrics179382
+Node: Utility180620
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:
