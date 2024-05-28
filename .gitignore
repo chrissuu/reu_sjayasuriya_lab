@@ -1,0 +1,15 @@
+.venv
+research/data
+research/data/Deep_194356/SERDP_LF_down_0.hdf5
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/t10k-images-idx3-ubyte
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/t10k-images-idx3-ubyte.gz
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/t10k-labels-idx1-ubyte
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/t10k-labels-idx1-ubyte.gz
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/train-images-idx3-ubyte
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/train-images-idx3-ubyte.gz
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/train-labels-idx1-ubyte
+ex_pytorch/ex_fashionMNIST/data/MNIST/raw/train-labels-idx1-ubyte.gz
+research/data/Deep_194356/mip_x.tif
+research/data/Deep_194356/mip_y.tif
+research/data/Deep_194356/mip_z.tif
+research/scripts/.venv/lib/python3.11/site-packages/_distutils_hack/__pycache__/__init__.cpython-311.pyc
