@@ -1,0 +1,7 @@
+We have 2 environments to run on Qiskit
+1 - environment.yml - This is a YML file for the Python environment. You can use Anaconda or Python Env to load this environment.
+  conda env update -n my_env --file ENV.yaml
+2 - Pennylane jupyter notebook - I have 2 jupyter notebooks. One for Google Colab and another for VisualStudio Code
+    * NOTE: VisualStudio Code can use the environment.yml file, but this is another way of loading
+3 - Qiskit yupyter notebook - I have an example for Google Colab
+4 - Google Colab accessing your local directory example
