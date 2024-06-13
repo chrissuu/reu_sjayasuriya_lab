@@ -1,1 +1,1 @@
-PRAUCtensor(0.8225)
+PRAUCtensor(0.7982)

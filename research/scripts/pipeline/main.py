@@ -85,6 +85,7 @@ def train(criterion1, criterion2, optimizer, net, num_epochs, dldr_trn):
 def test(net, dldr_tst):
     preds = []
     labels = []
+    imax = []
 
 
     with torch.no_grad():
@@ -99,6 +100,10 @@ def test(net, dldr_tst):
 
             preds.append(output.tolist())
             labels.append(label.tolist())
+            imax.append(i)
+            print(inputs.shape)
+
+    print(f"num_test {i}".format(i = max(imax)))
 
     return "PRAUC" + str(binary_auprc(torch.tensor(preds).squeeze(0).squeeze(2), \
            torch.tensor(labels), num_tasks=len(preds)).mean())
