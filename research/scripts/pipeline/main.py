@@ -75,10 +75,10 @@ def train(criterion1, criterion2, optimizer, net, num_epochs, dldr_trn):
             # print statistics
             running_loss += loss.item()
             
-            if i % 5 == 4:    # print every 2000 mini-batches
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 5:.3f}')
+            # if i % 5 == 4:    # print every 2000 mini-batches
+            #     print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 5:.3f}')
               
-                running_loss = 0.0
+            #     running_loss = 0.0
 
     return
 
@@ -101,9 +101,9 @@ def test(net, dldr_tst):
             preds.append(output.tolist())
             labels.append(label.tolist())
             imax.append(i)
-            print(inputs.shape)
+            # print(inputs.shape)
 
-    print(f"num_test {i}".format(i = max(imax)))
+    # print(f"num_test {i}".format(i = max(imax)))
 
     return "PRAUC" + str(binary_auprc(torch.tensor(preds).squeeze(0).squeeze(2), \
            torch.tensor(labels), num_tasks=len(preds)).mean())
