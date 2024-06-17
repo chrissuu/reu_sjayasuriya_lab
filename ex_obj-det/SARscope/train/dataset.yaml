@@ -1,0 +1,7 @@
+
+train: /home/imaginglyceum/Desktop/reu_suren_lab2024/ex_obj-det/SARscope/train_images
+val: /home/imaginglyceum/Desktop/reu_suren_lab2024/ex_obj-det/SARscope/valid_images
+test: /home/imaginglyceum/Desktop/reu_suren_lab2024/ex_obj-det/SARscope/test_images
+
+nc: 2
+names: ['background','ship']

@@ -1,0 +1,6 @@
+names:
+- ship
+nc: 1
+path: ..
+train: /home/imaginglyceum/Desktop/reu_suren_lab2024/ex_obj-det/SARscope/valid/images
+val: /home/imaginglyceum/Desktop/reu_suren_lab2024/ex_obj-det/SARscope/valid/images

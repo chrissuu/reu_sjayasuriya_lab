@@ -85,7 +85,7 @@ def train(criterion1, criterion2, optimizer, net, num_epochs, dldr_trn):
 def test(net, dldr_tst):
     preds = []
     labels = []
-    imax = []
+    # imax = []
 
 
     with torch.no_grad():
@@ -100,7 +100,7 @@ def test(net, dldr_tst):
 
             preds.append(output.tolist())
             labels.append(label.tolist())
-            imax.append(i)
+            # imax.append(i)
             # print(inputs.shape)
 
     # print(f"num_test {i}".format(i = max(imax)))
@@ -108,45 +108,45 @@ def test(net, dldr_tst):
     return "PRAUC" + str(binary_auprc(torch.tensor(preds).squeeze(0).squeeze(2), \
            torch.tensor(labels), num_tasks=len(preds)).mean())
 
+for i in range(1, 15):
+    net_vhn = ATR(nc = 1) # initializes VHN convnet; nc = input should have 1 channel
+    criterion1 = nn.BCELoss()
+    criterion2 = nn.MSELoss()
+    optimizer = optim.Adam(net_vhn.parameters(), lr=0.001)
 
-net = ATR(nc = 1) # initializes VHN convnet; nc = input should have 1 channel
-criterion1 = nn.BCELoss()
-criterion2 = nn.MSELoss()
-optimizer = optim.Adam(net.parameters(), lr=0.001)
+    train(criterion1, criterion2, optimizer, net_vhn, num_epochs = 5, dldr_trn = dldr_trn)
 
-train(criterion1, criterion2, optimizer, net, num_epochs = 2, dldr_trn = dldr_trn)
+    print("finished training VHN ATR\n")
 
-print("finished training VHN ATR\n")
+    res = test(net_vhn, dldr_tst=dldr_tst)
 
-res = test(net, dldr_tst=dldr_tst)
+    print("finished testing VHN ATR\n")
 
-print("finished testing VHN ATR\n")
+    torch.save(net_vhn, './saves/vhn.pt')
 
-torch.save(net, './saves/vhn.pt')
+    vhn_weight = net_vhn.vhn.weights
 
-vhn_weight = net.vhn.weights
+    np.save(path_vhn_sv_wghts, vhn_weight.detach().numpy())
 
-np.save(path_vhn_sv_wghts, vhn_weight.detach().numpy())
+    res_vhn_txt = open(f"test_iter{i}.txt", 'w')
+    res_vhn_txt.write(str(res))
+    res_vhn_txt.close()
 
-res_vhn_txt = open(path_vhn_sv, 'w')
-res_vhn_txt.write(str(res))
-res_vhn_txt.close()
+# netp = ATRP(nc = 1) # initializes VHN convnet; nc = input should have 1 channel
+# criterion1 = nn.BCELoss()
+# criterion2 = None
+# optimizer = optim.Adam(netp.parameters(), lr=0.001)
 
-netp = ATRP(nc = 1) # initializes VHN convnet; nc = input should have 1 channel
-criterion1 = nn.BCELoss()
-criterion2 = None
-optimizer = optim.Adam(netp.parameters(), lr=0.001)
+# train(criterion1, criterion2, optimizer, netp, num_epochs=5, dldr_trn = dldr_trn_reg)
 
-train(criterion1, criterion2, optimizer, netp, num_epochs=2, dldr_trn = dldr_trn)
+# print("finished training REG ATR\n")
 
-print("finished training REG ATR\n")
+# res = test(netp, dldr_tst=dldr_tst_reg)
 
-res = test(netp, dldr_tst=dldr_tst)
+# print("finished testing REG ATR\n")
 
-print("finished testing REG ATR\n")
+# torch.save(netp, './saves/reg.pt')
 
-torch.save(netp, './saves/reg.pt')
-
-res_reg_txt = open(path_reg_sv, 'w')
-res_reg_txt.write(str(res))
-res_reg_txt.close()
+# res_reg_txt = open(path_reg_sv, 'w')
+# res_reg_txt.write(str(res))
+# res_reg_txt.close()
