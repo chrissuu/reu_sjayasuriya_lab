@@ -132,21 +132,21 @@ res_vhn_txt = open(path_vhn_sv, 'w')
 res_vhn_txt.write(str(res))
 res_vhn_txt.close()
 
-# netp = ATRP(nc = 1) # initializes VHN convnet; nc = input should have 1 channel
-# criterion1 = nn.BCELoss()
-# criterion2 = None
-# optimizer = optim.Adam(netp.parameters(), lr=0.001)
+netp = ATRP(nc = 1) # initializes VHN convnet; nc = input should have 1 channel
+criterion1 = nn.BCELoss()
+criterion2 = None
+optimizer = optim.Adam(netp.parameters(), lr=0.001)
 
-# train(criterion1, criterion2, optimizer, netp, num_epochs=2, dldr_trn = dldr_trn)
+train(criterion1, criterion2, optimizer, netp, num_epochs=2, dldr_trn = dldr_trn)
 
-# print("finished training REG ATR\n")
+print("finished training REG ATR\n")
 
-# res = test(netp, dldr_tst=dldr_tst)
+res = test(netp, dldr_tst=dldr_tst)
 
-# print("finished testing REG ATR\n")
+print("finished testing REG ATR\n")
 
-# torch.save(netp, './saves/reg.pt')
+torch.save(netp, './saves/reg.pt')
 
-# res_reg_txt = open(path_reg_sv, 'w')
-# res_reg_txt.write(str(res))
-# res_reg_txt.close()
+res_reg_txt = open(path_reg_sv, 'w')
+res_reg_txt.write(str(res))
+res_reg_txt.close()

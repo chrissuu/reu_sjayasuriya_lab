@@ -7,12 +7,16 @@ import matplotlib.pyplot as plt
 
 n_epochs = 5   # Number of optimization epochs
 n_layers = 1   # Number of random layers
-n_train = 30  # Size of the train dataset
-n_test = 10  # Size of the test dataset
+n_train = 3  # Size of the train dataset
+n_test = 2  # Size of the test dataset
 max_filters = 30
 
 q_histories = []
 # c_histories = []
+q_img_history_trn = []
+q_img_history_tst = []
+
+_num_filters_const = 1
 
 for num_filters in range(1, max_filters, 3):
     # num_filters = 20
@@ -56,11 +60,11 @@ for num_filters in range(1, max_filters, 3):
         return [qml.expval(qml.PauliZ(j)) for j in range(4)]
 
 
-    def quanv(image, num_filters):
+    def quanv(image, num_filters_const):
         """Convolves the input image with many applications of the same quantum circuit."""
-        tot = np.zeros((14, 14, 4, num_filters))
+        tot = np.zeros((14, 14, 4, num_filters_const))
         
-        for i in range(num_filters):
+        for i in range(num_filters_const):
             out = np.zeros((14, 14, 4))
         
             # Loop over the coordinates of the top-left pixel of 2X2 squares
@@ -88,7 +92,7 @@ for num_filters in range(1, max_filters, 3):
             print("{}/{}        ".format(idx + 1, n_train), end="\r")
             # _q_train_images = np.array_split(quanv(img, num_filters), num_filters, axis = 3)
             # print(_q_train_images[0].shape)
-            for img in quanv(img, num_filters):
+            for img in quanv(img, _num_filters_const):
                 q_train_images.append(img)
         q_train_images = np.asarray(q_train_images)
 
@@ -97,7 +101,7 @@ for num_filters in range(1, max_filters, 3):
         for idx, img in enumerate(test_images):
             print("{}/{}        ".format(idx + 1, n_test), end="\r")
             # _q_test_images = np.array_split(quanv(img, num_filters), num_filters, axis = 3)
-            for img in quanv(img, num_filters):
+            for img in quanv(img, _num_filters_const):
                 q_test_images.append(img)
         q_test_images = np.asarray(q_test_images)
 
@@ -112,22 +116,34 @@ for num_filters in range(1, max_filters, 3):
 
 
     print(q_train_images.shape)
-    q_train_images = q_train_images.reshape((n_train, 14, 14, 4 * num_filters))
+    q_train_images = q_train_images.reshape((n_train, 14, 14, 4 * _num_filters_const))
     print(q_train_images.shape)
 
+    q_img_history_trn.append(q_train_images)
+
     print(q_test_images.shape)
-    q_test_images = q_test_images.reshape((n_test, 14, 14, 4 * num_filters))
+    q_test_images = q_test_images.reshape((n_test, 14, 14, 4 * _num_filters_const))
     print(q_test_images.shape)
 
+    q_img_history_tst.append(q_test_images)
+    
+    print("len tst", len(q_img_history_tst))
+    print("len trn", len(q_img_history_trn))
+    if len(q_img_history_tst) > 1:
+        q_train_images = np.stack((np.array(q_img_history_trn)), axis = 4)
+        q_test_images = np.stack((np.array(q_img_history_tst)), axis = 4)
+
+    print(q_train_images.shape)
+    print(q_test_images.shape)
     def MyModel():
         """Initializes and returns a custom Keras model
         which is ready to be trained."""
         model = keras.models.Sequential([
-            keras.layers.Conv2D(num_filters * 4, (2,2), activation = 'relu', input_shape=(14, 14, num_filters * 4)),
+            keras.layers.Conv2D(_num_filters_const * 4, (2,2), activation = 'relu', input_shape=(14, 14, _num_filters_const * 4)),
             keras.layers.AveragePooling2D((2,2), padding = "same"),
-            keras.layers.Conv2D(num_filters * 8, (2,2), activation = 'relu'),
+            keras.layers.Conv2D(_num_filters_const * 8, (2,2), activation = 'relu'),
             keras.layers.Flatten(),
-            keras.layers.Dense(num_filters * 4, activation = 'relu'),
+            keras.layers.Dense(_num_filters_const * 4, activation = 'relu'),
             keras.layers.Dense(10, activation="softmax")
         ])
 
@@ -140,6 +156,7 @@ for num_filters in range(1, max_filters, 3):
 
     q_model = MyModel()
 
+    
     q_history = q_model.fit(
         q_train_images,
         train_labels,
