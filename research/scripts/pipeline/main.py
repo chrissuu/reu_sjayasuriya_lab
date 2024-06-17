@@ -114,7 +114,7 @@ for i in range(1, 15):
     criterion2 = nn.MSELoss()
     optimizer = optim.Adam(net_vhn.parameters(), lr=0.001)
 
-    train(criterion1, criterion2, optimizer, net_vhn, num_epochs = 5, dldr_trn = dldr_trn)
+    train(criterion1, criterion2, optimizer, net_vhn, num_epochs = i, dldr_trn = dldr_trn)
 
     print("finished training VHN ATR\n")
 
