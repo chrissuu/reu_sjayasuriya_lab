@@ -132,7 +132,7 @@ for i in range(1, 15):
     res_vhn_txt.write(str(res))
     res_vhn_txt.close()
 
-# netp = ATRP(nc = 1) # initializes VHN convnet; nc = input should have 1 channel
+# netp = ATRP(nc = 1) # initializes REG convnet; nc = input should have 1 channel
 # criterion1 = nn.BCELoss()
 # criterion2 = None
 # optimizer = optim.Adam(netp.parameters(), lr=0.001)
