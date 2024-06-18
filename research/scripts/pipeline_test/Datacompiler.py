@@ -233,7 +233,7 @@ class DataGenerator:
                 data = self.preprocess(data)
 
 
-                batch_data, batch_label = data, torch.tensor(0)
+                batch_data, batch_label = data, torch.zeros(1)
 
             else:
                 data = self.readHDF(self.target_list[self.iters//2])
@@ -241,7 +241,7 @@ class DataGenerator:
                 data = self.preprocess(data)
 
 
-                batch_data, batch_label = data, torch.tensor(0)
+                batch_data, batch_label = data, torch.zeros(1)
 
         else:
             print('next epoch')

@@ -31,9 +31,10 @@ device = (
 )
 
 CLOUD = False
-LINUX = False
+LINUX = True
 HARDSTOP = 2
-
+QUBIT = "lightning.qubit" 
+# if not LINUX else "lightning.gpu"
 path_trn = ""
 path_tst = ""
 path_hdf = ""
@@ -84,7 +85,7 @@ def generate_datum(train_images, n_layers, iters, skip):
     stores = [[] for i in range(len(train_images))]
     
         
-    dev = qml.device("lightning.qubit", wires=8)
+    dev = qml.device(QUBIT, wires=8)
     # Random circuit parameters
     
 
