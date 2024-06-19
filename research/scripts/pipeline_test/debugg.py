@@ -33,9 +33,10 @@ device = (
 CLOUD = False
 LINUX = False
 HARDSTOP = 100
-BATCH_SIZE = 32
+HARDSTOP_TST = 32
+BATCH_SIZE = 4 # MAKE SURE BATCH_SIZE ARE FACTORS OF HARDSTOP_TST AND HARDSTO
 QUBIT = "lightning.qubit" 
-KERNEL = 8
+KERNEL = 4
 # if not LINUX else "lightning.gpu"
 path_trn = ""
 path_tst = ""
@@ -44,6 +45,8 @@ path_hdf = ""
 path_vhn_sv = ""
 path_vhn_sv_wghts = ""
 path_reg_sv = ""
+
+SAVE_PATH = "../../../../research_data/qnn_data/"  # Data saving folder
 
 if CLOUD:
     path_trn = '/data/sjayasur/greg_data/train/'
@@ -73,12 +76,14 @@ wghts = np.load(path_vhn_sv_wghts)
 
 n_layers = 1   # Number of random layers
 
-SAVE_PATH = "../../../research_data/qnn_data/"  # Data saving folder
-PREPROCESS = True           # If False, skip quantum processing and load data from SAVE_PATH
+
 np.random.seed(0)           # Seed for NumPy random number generator
 tf.random.set_seed(0)       # Seed for TensorFlow random number generator
 
-
+q_train_images = np.array([])
+q_test_images = np.array([])
+np.save(SAVE_PATH + "/train", q_train_images)
+np.save(SAVE_PATH + "/test", q_test_images)
 #creates iters datasets with skip filters
 def generate_datum(train_images, n_layers, iters, skip):
     
@@ -114,13 +119,9 @@ def generate_datum(train_images, n_layers, iters, skip):
                     q_results = circuit(
                         [
                             image[j, k, m],
-                            image[j, k + 1, m],
-                            image[j + 1, k, m],
                             image[j + 1, k + 1, m],
-                            image[j, k, m+1],
                             image[j, k + 1, m+1],
                             image[j + 1, k, m+1],
-                            image[j + 1, k + 1, m+1],
                         ], 
                         rand_params
                     )
@@ -172,7 +173,8 @@ def create_lists(path, path_hdf, BZ, IR, HARDSTOP):
     labels = []
     for i, data in enumerate(dldr,0):
         inputs, label = data
-        inputs = f_VHN(inputs, wghts)
+        
+        inputs = np.array(min_max(torch.tensor(inputs)))
         # print(f"type of image: {type(inputs)}\n\n") 
         if i < HARDSTOP:
             
@@ -187,27 +189,37 @@ def create_lists(path, path_hdf, BZ, IR, HARDSTOP):
 
 
             inputs = torch.log10(torch.tensor(inputs) + 1)
+            inputs = np.array(min_max(inputs))
+
             # print(inputs.shape)
             images.append(inputs)
             labels.append(label)
         
     return images, labels
 
-train_images, train_labels = create_lists(path = path_trn, path_hdf = path_hdf, BZ = 1, IR = 1, HARDSTOP = HARDSTOP)
+# train_images, train_labels = create_lists(path = path_trn, path_hdf = path_hdf, BZ = 1, IR = 1, HARDSTOP = HARDSTOP)
 
-test_images, test_labels = create_lists(path = path_tst, path_hdf = path_hdf, BZ = 1, IR = 1, HARDSTOP = HARDSTOP)
-print("\n\nFINISHED LOADING DATASETS\n\n")
+# test_images, test_labels = create_lists(path = path_tst, path_hdf = path_hdf, BZ = 1, IR = 1, HARDSTOP = HARDSTOP_TST)
 
-print(f"Len of TRAIN dataset: {len(train_images)}")
-print(f"Len of TEST dataset: {len(test_images)}")
-print(f"Shape of data: {test_images[0].shape}")
-# shape shold be 20, 101, 64, 64 before CNN input.#
+# np.save(SAVE_PATH + "q_train_images.npy", train_images)
+# np.save(SAVE_PATH + "q_test_images.npy", test_images)
+# np.save(SAVE_PATH + "q_train_labels.npy", train_labels)
+# np.save(SAVE_PATH + "q_test_labels.npy", test_labels)
+
+# print("\n\nFINISHED LOADING DATASETS\n\n")
+
+# print(f"Len of TRAIN dataset: {len(train_images)}")
+# print(f"Len of TEST dataset: {len(test_images)}")
+# print(f"Shape of data: {test_images[0].shape}")
+# # shape shold be 20, 101, 64, 64 before CNN input.#
 
 skip = 1 #skips ~ num filters. #kerneled imgs = skip * 8
 iters = 1 #only change iters if you want to test scaling laws
 n_layers = 1
-dataset_trn_np = np.array(generate_data(images=train_images, n_layers = n_layers, num_filters = skip)[0], dtype = 'float').squeeze(1)
-dataset_tst_np = np.array(generate_data(images=test_images, n_layers = n_layers, num_filters = skip)[0], dtype = 'float').squeeze(1)
+train_labels = np.load(SAVE_PATH + "q_train_labels.npy")
+test_labels = np.load(SAVE_PATH + "q_test_labels.npy")
+dataset_trn_np = np.load(SAVE_PATH + "q_train_dataset.npy")
+dataset_tst_np = np.load(SAVE_PATH + "q_test_dataset.npy")
 
 print(f"Type of dataset: {type(dataset_trn_np)}")
 print(f"Shape of TRAIN dataset: {dataset_trn_np.shape}")
@@ -217,7 +229,6 @@ print(f"Shape of TRAIN dataset: {dataset_trn_np.shape}")
 # for dataset in datasets:
 
 #     print((dataset).shape)
-
 dataset_trn = QuantumDataset(dataset_trn_np, np.array(train_labels, dtype = 'float'))
 dataset_tst = QuantumDataset(dataset_tst_np, np.array(test_labels, dtype = 'float'))
 
@@ -260,8 +271,9 @@ class ATRP(nn.Module):
         x = torch.flatten(x, 1) # flatten all dimensions except batch
 
         x = self.f2(x)
-
+        print(x)
         y = self.sigmoid(x)
+        print(y)
 
         return y
     

@@ -12,20 +12,23 @@ def train(criterion1, criterion2, optimizer, net, num_epochs, dldr_trn):
             # get the inputs; data is a list of [inputs, labels]
         
             inputs, labels = data
-            print(f"inputs shape: {inputs.shape}")
-            inputs = torch.log10(torch.tensor(inputs).transpose(1,3) + 1)
+            print(f"Inputs shape: {inputs.shape}")
+            temp_inputs = (torch.log10(inputs + 1)).float().squeeze(0)
+            print(f"Inputs shape post: {inputs.shape}")
+
             # print(inputs.shape)
-            labels = torch.tensor(labels)
+            temp_labels = labels
             # zero the parameter gradients
             optimizer.zero_grad()
 
             # print(inputs)
             # forward + backward + optimize
-            outputs = net(inputs)
-            loss = criterion1(outputs, labels.reshape(20,1).type(torch.float32))
+            # print(f"TEMP INPUTS TYPE: {type(temp_inputs.item())}")
+            outputs = net(temp_inputs)
+            loss = criterion1(outputs, temp_labels.reshape(dldr_trn.batch_size,1).type(torch.float32))
             if criterion2: 
                 loss += criterion2(curly_Nprime(net.vhn.weights), \
-                                curly_N(torch.sum(inputs, dim = 0) \
+                                curly_N(torch.sum(temp_inputs, dim = 0) \
                                         / dldr_trn.batch_size))
             # print("netvhn", net.vhn.weights.shape)
             # print(curly_N(torch.sum(inputs, dim = 0) / dldr.batch_size).shape)
@@ -47,24 +50,41 @@ def test(net, dldr_tst):
     preds = []
     labels = []
     # imax = []
-
-
+    correct = 0
+    total = 0
     with torch.no_grad():
         for i, data in enumerate(dldr_tst,0):
             inputs, label = data
             
-            inputs = torch.log10(torch.tensor(inputs).transpose(1,3) + 1)
+            temp_inputs = torch.log10(inputs + 1).float().squeeze(0)
             # print(inputs.shape)
-            label = torch.tensor(label)
+            temp_label = label
             # calculate outputs by running images through the 
-            output = net(inputs)
+            output = net(temp_inputs)
 
             preds.append(output.tolist())
-            labels.append(label.tolist())
+            labels.append(temp_label.tolist())
             # imax.append(i)
             # print(inputs.shape)
-
+    preds_parsed = []
+    labels_parsed = []
     # print(f"num_test {i}".format(i = max(imax)))
+    for i, pred_list in enumerate(preds):
+        total += len(pred_list)
+        for k, pred in enumerate(pred_list):
+            preds_parsed.append(pred)
+            labels_parsed.append(labels[i][k][0])
+            if pred[0] >= 0.5: 
+                if labels[i][k][0] == 1:
+                    correct += 1
+            else:
+                if labels[i][k][0] == 0:
+                    correct += 1
 
-    return "PRAUC" + str(binary_auprc(torch.tensor(preds).squeeze(0).squeeze(2), \
-           torch.tensor(labels), num_tasks=len(preds)).mean())
+    
+    print(preds)
+    print(labels)
+    print("PRAUC" + str(binary_auprc(torch.tensor(preds_parsed).squeeze(1), 
+           torch.tensor(labels_parsed), num_tasks=1).mean()))
+
+    return f"ACCURACY {correct / total} "

@@ -12,8 +12,8 @@ import torcheval
 from torcheval.metrics.functional import binary_auprc
 import matplotlib.pyplot as plt
 
-def generate_compiler(data_root, hdf_data_path,BZ,IR,
-                        label_scheme='label'):
+def generate_compiler(data_root, hdf_data_path,BZ,IR,HARDSTOP,
+                        label_scheme='label' ):
     """
     Gathers all files and organize into train/validation/test. Each
        data subset is further organized by class. Converts file lists
@@ -36,20 +36,24 @@ def generate_compiler(data_root, hdf_data_path,BZ,IR,
     
     #print('Allocating HDFs to train/valid/test...')
     
-
+    cnt = 0
     for filename in os.listdir(data_root):
         if not filename.endswith('.hdf'):
             continue
 
         # Extract the label using 'label_scheme' identifier
+        if len(files[0]) >= HARDSTOP and len(files[1]) >= HARDSTOP:
+            break
         label = int(int(filename.split('_')[3]) > 0)  # 0 = clutter (not manmade); 1 = target (manmade)
-
-        
             
         files[label].append(filename)
 
-    print(f"clutter len: {len(files[0])}")
-    print(f"target len: {len(files[1])}")       
+        cnt += 1
+
+        
+
+    print(f"Clutter len: {len(files[0])}")
+    print(f"Target len: {len(files[1])}")       
 
     # Wrap each file list into an iterable data generator that actually
     #     read the HDFs when __next__ is called:
@@ -241,10 +245,10 @@ class DataGenerator:
                 data = self.preprocess(data)
 
 
-                batch_data, batch_label = data, torch.zeros(1)
+                batch_data, batch_label = data, torch.ones(1)
 
         else:
-            print('next epoch')
+            print('\nNEXT\n')
             raise StopIteration
 
         self.iters += 1

@@ -20,6 +20,7 @@ def relu(x):
 def curly_N(w):
     w_min, w_max = torch.min(torch.min(torch.min(w))), torch.max(torch.max(torch.max(w)))
     reg_N = (w - w_min) / (w_max - w_min)
+    print(reg_N.min(), reg_N.max())
     return reg_N
 
 def curly_Nprime(w):
@@ -34,6 +35,9 @@ def f_VHN(x, w):
     
     return relu_x * relu_w
     
+def min_max(x):
+    
+    return curly_Nprime(x)
 class VHNLayer(nn.Module):
     """ Custom VHN layer """
     def __init__(self, channels, img_len, img_width):

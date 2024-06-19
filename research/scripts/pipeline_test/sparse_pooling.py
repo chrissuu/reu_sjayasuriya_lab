@@ -32,10 +32,11 @@ device = (
 
 CLOUD = False
 LINUX = False
-HARDSTOP = 100
-BATCH_SIZE = 32
+HARDSTOP = 200
+HARDSTOP_TST = 64
+BATCH_SIZE = 4 # MAKE SURE BATCH_SIZE ARE FACTORS OF HARDSTOP_TST AND HARDSTO
 QUBIT = "lightning.qubit" 
-KERNEL = 8
+KERNEL = 4
 # if not LINUX else "lightning.gpu"
 path_trn = ""
 path_tst = ""
@@ -44,6 +45,8 @@ path_hdf = ""
 path_vhn_sv = ""
 path_vhn_sv_wghts = ""
 path_reg_sv = ""
+
+SAVE_PATH = "../../../../research_data/qnn_data/"  # Data saving folder
 
 if CLOUD:
     path_trn = '/data/sjayasur/greg_data/train/'
@@ -73,13 +76,17 @@ wghts = np.load(path_vhn_sv_wghts)
 
 n_layers = 1   # Number of random layers
 
-SAVE_PATH = "../../../research_data/qnn_data/"  # Data saving folder
-PREPROCESS = True           # If False, skip quantum processing and load data from SAVE_PATH
+
 np.random.seed(0)           # Seed for NumPy random number generator
 tf.random.set_seed(0)       # Seed for TensorFlow random number generator
 
-
+q_train_images = np.array([])
+q_test_images = np.array([])
+np.save(SAVE_PATH + "/train", q_train_images)
+np.save(SAVE_PATH + "/test", q_test_images)
 #creates iters datasets with skip filters
+_rand_params = np.random.uniform(high=2 * np.pi, size=(n_layers, KERNEL))
+
 def generate_datum(train_images, n_layers, iters, skip):
     
     train_datasets = [[[] for img in train_images] for i in range(skip)]
@@ -114,13 +121,9 @@ def generate_datum(train_images, n_layers, iters, skip):
                     q_results = circuit(
                         [
                             image[j, k, m],
-                            image[j, k + 1, m],
-                            image[j + 1, k, m],
                             image[j + 1, k + 1, m],
-                            image[j, k, m+1],
                             image[j, k + 1, m+1],
                             image[j + 1, k, m+1],
-                            image[j + 1, k + 1, m+1],
                         ], 
                         rand_params
                     )
@@ -136,10 +139,9 @@ def generate_datum(train_images, n_layers, iters, skip):
         # when this loop exits, there would be skip * iters * KERNEL kerneled images,
         # imgs, in stores[imgs]
         print(f"Generating kerneled dataset {i} of filtered images\n")
-        rand_params = np.random.uniform(high=2 * np.pi, size=(n_layers, KERNEL))
         for idx, img in enumerate(train_images):
             start_temp = time.time()
-            stores[idx].append(quanv(img, rand_params))
+            stores[idx].append(quanv(img, _rand_params))
             end_temp = time.time()
             print(f"img {idx+1} took {end_temp - start_temp} seconds to process")
     end = time.time()
@@ -172,7 +174,7 @@ def create_lists(path, path_hdf, BZ, IR, HARDSTOP):
     labels = []
     for i, data in enumerate(dldr,0):
         inputs, label = data
-        inputs = f_VHN(inputs, wghts)
+
         # print(f"type of image: {type(inputs)}\n\n") 
         if i < HARDSTOP:
             
@@ -187,6 +189,7 @@ def create_lists(path, path_hdf, BZ, IR, HARDSTOP):
 
 
             inputs = torch.log10(torch.tensor(inputs) + 1)
+            inputs = np.array(min_max(inputs))
             # print(inputs.shape)
             images.append(inputs)
             labels.append(label)
@@ -195,7 +198,13 @@ def create_lists(path, path_hdf, BZ, IR, HARDSTOP):
 
 train_images, train_labels = create_lists(path = path_trn, path_hdf = path_hdf, BZ = 1, IR = 1, HARDSTOP = HARDSTOP)
 
-test_images, test_labels = create_lists(path = path_tst, path_hdf = path_hdf, BZ = 1, IR = 1, HARDSTOP = HARDSTOP)
+test_images, test_labels = create_lists(path = path_tst, path_hdf = path_hdf, BZ = 1, IR = 1, HARDSTOP = HARDSTOP_TST)
+
+np.save(SAVE_PATH + "q_train_images.npy", train_images)
+np.save(SAVE_PATH + "q_test_images.npy", test_images)
+np.save(SAVE_PATH + "q_train_labels.npy", train_labels)
+np.save(SAVE_PATH + "q_test_labels.npy", test_labels)
+
 print("\n\nFINISHED LOADING DATASETS\n\n")
 
 print(f"Len of TRAIN dataset: {len(train_images)}")
@@ -208,6 +217,9 @@ iters = 1 #only change iters if you want to test scaling laws
 n_layers = 1
 dataset_trn_np = np.array(generate_data(images=train_images, n_layers = n_layers, num_filters = skip)[0], dtype = 'float').squeeze(1)
 dataset_tst_np = np.array(generate_data(images=test_images, n_layers = n_layers, num_filters = skip)[0], dtype = 'float').squeeze(1)
+
+np.save(SAVE_PATH + "q_train_dataset.npy", dataset_trn_np)
+np.save(SAVE_PATH + "q_test_dataset.npy", dataset_tst_np)
 
 print(f"Type of dataset: {type(dataset_trn_np)}")
 print(f"Shape of TRAIN dataset: {dataset_trn_np.shape}")
@@ -284,3 +296,4 @@ torch.save(netp, './saves/reg.pt')
 res_reg_txt = open(path_reg_sv, 'w')
 res_reg_txt.write(str(res))
 res_reg_txt.close()
+
