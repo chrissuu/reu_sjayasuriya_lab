@@ -32,8 +32,8 @@ device = (
 
 CLOUD = False
 LINUX = False
-HARDSTOP = 200
-HARDSTOP_TST = 64
+HARDSTOP = 128 # how many imgs to use. 2 * HARDSTOP, balanced
+HARDSTOP_TST = 32
 BATCH_SIZE = 4 # MAKE SURE BATCH_SIZE ARE FACTORS OF HARDSTOP_TST AND HARDSTO
 QUBIT = "lightning.qubit" 
 KERNEL = 4
@@ -86,6 +86,7 @@ np.save(SAVE_PATH + "/train", q_train_images)
 np.save(SAVE_PATH + "/test", q_test_images)
 #creates iters datasets with skip filters
 _rand_params = np.random.uniform(high=2 * np.pi, size=(n_layers, KERNEL))
+np.save(SAVE_PATH + "/params", _rand_params)
 
 def generate_datum(train_images, n_layers, iters, skip):
     
@@ -176,7 +177,7 @@ def create_lists(path, path_hdf, BZ, IR, HARDSTOP):
         inputs, label = data
 
         # print(f"type of image: {type(inputs)}\n\n") 
-        if i < HARDSTOP:
+        if i < 2 * HARDSTOP:
             
             if HARDSTOP != float('inf'):
                 
@@ -283,17 +284,19 @@ criterion1 = nn.BCELoss()
 criterion2 = None
 optimizer = optim.Adam(netp.parameters(), lr=0.001)
 
-train(criterion1, criterion2, optimizer, netp, num_epochs=5, dldr_trn = dldr_trn)
+train(criterion1, criterion2, optimizer, netp, num_epochs=2, dldr_trn = dldr_trn)
 
 print("finished training REG ATR\n")
 
-res = test(netp, dldr_tst=dldr_tst)
+accuracy, aucpr, str_accuracy, str_aucpr = test(netp, dldr_tst=dldr_tst)
 
 print("finished testing REG ATR\n")
 
 torch.save(netp, './saves/reg.pt')
 
 res_reg_txt = open(path_reg_sv, 'w')
-res_reg_txt.write(str(res))
+res_reg_txt.write(str_aucpr)
+res_reg_txt.write("\n")
+res_reg_txt.write(str_accuracy)
 res_reg_txt.close()
 

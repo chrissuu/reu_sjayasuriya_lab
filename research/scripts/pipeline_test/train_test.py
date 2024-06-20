@@ -6,15 +6,14 @@ from utils import *
 
 def train(criterion1, criterion2, optimizer, net, num_epochs, dldr_trn):
     for epoch in range(num_epochs):  # loop over the dataset multiple times
-        print("epoch {epoch}".format(epoch=epoch))
         running_loss = 0.0
         for i, data in enumerate(dldr_trn, 0):
             # get the inputs; data is a list of [inputs, labels]
         
             inputs, labels = data
-            print(f"Inputs shape: {inputs.shape}")
+            # print(f"Inputs shape: {inputs.shape}")
             temp_inputs = (torch.log10(inputs + 1)).float().squeeze(0)
-            print(f"Inputs shape post: {inputs.shape}")
+            # print(f"Inputs shape post: {inputs.shape}")
 
             # print(inputs.shape)
             temp_labels = labels
@@ -73,6 +72,10 @@ def test(net, dldr_tst):
         total += len(pred_list)
         for k, pred in enumerate(pred_list):
             preds_parsed.append(pred)
+            # if pred[0] >= 0.5:
+            #     preds_parsed.append([1])
+            # else:
+            #     preds_parsed.append([0])
             labels_parsed.append(labels[i][k][0])
             if pred[0] >= 0.5: 
                 if labels[i][k][0] == 1:
@@ -82,9 +85,9 @@ def test(net, dldr_tst):
                     correct += 1
 
     
-    print(preds)
-    print(labels)
-    print("PRAUC" + str(binary_auprc(torch.tensor(preds_parsed).squeeze(1), 
-           torch.tensor(labels_parsed), num_tasks=1).mean()))
+    print(preds_parsed)
+    print(labels_parsed)
+    print()
 
-    return f"ACCURACY {correct / total} "
+    return correct/total, binary_auprc(torch.tensor(preds_parsed).squeeze(1), 
+           torch.tensor(labels_parsed), num_tasks=1).mean(), f"ACCURACY {correct / total}", f"PRAUC {binary_auprc(torch.tensor(preds_parsed).squeeze(1), torch.tensor(labels_parsed), num_tasks=1).mean()}"

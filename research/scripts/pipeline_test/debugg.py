@@ -32,8 +32,8 @@ device = (
 
 CLOUD = False
 LINUX = False
-HARDSTOP = 100
-HARDSTOP_TST = 32
+HARDSTOP = 4
+HARDSTOP_TST = 4
 BATCH_SIZE = 4 # MAKE SURE BATCH_SIZE ARE FACTORS OF HARDSTOP_TST AND HARDSTO
 QUBIT = "lightning.qubit" 
 KERNEL = 4
@@ -46,7 +46,7 @@ path_vhn_sv = ""
 path_vhn_sv_wghts = ""
 path_reg_sv = ""
 
-SAVE_PATH = "../../../../research_data/qnn_data/"  # Data saving folder
+SAVE_PATH = "../../../../research_data/qnn_data/200_64/"  # Data saving folder
 
 if CLOUD:
     path_trn = '/data/sjayasur/greg_data/train/'
@@ -263,7 +263,7 @@ class ATRP(nn.Module):
         "image vectorization"
         # print(x0.shape)
         # x0.unsqueeze(1)
-        print(x0.shape)
+        # print(x0.shape)
         x0 = x0.reshape((self.bz, self.nc, 32, 32, 50))
         x = self.conv1(x0)
         x = self.avgpool(F.relu(x))
@@ -271,9 +271,9 @@ class ATRP(nn.Module):
         x = torch.flatten(x, 1) # flatten all dimensions except batch
 
         x = self.f2(x)
-        print(x)
+        # print(x)
         y = self.sigmoid(x)
-        print(y)
+        # print(y)
 
         return y
     
@@ -281,18 +281,47 @@ class ATRP(nn.Module):
 netp = ATRP(nc = KERNEL, bz = BATCH_SIZE) # initializes REG convnet; nc = input should have 1 channel
 criterion1 = nn.BCELoss()
 criterion2 = None
-optimizer = optim.Adam(netp.parameters(), lr=0.001)
+optimizer = optim.Adam(netp.parameters(), lr=0.0002)
 
-train(criterion1, criterion2, optimizer, netp, num_epochs=5, dldr_trn = dldr_trn)
+NUM_EPOCHS = 50
+arr_epoch = [i for i in range(0, NUM_EPOCHS, 2)]
+arr_acc = []
+arr_aucpr = []
 
-print("finished training REG ATR\n")
+for i in range (0, NUM_EPOCHS, 2):
 
-res = test(netp, dldr_tst=dldr_tst)
+    train(criterion1, criterion2, optimizer, netp, num_epochs=i, dldr_trn = dldr_trn)
+
+    
+
+    accuracy, aucpr, str_accuracy, str_aucpr = test(netp, dldr_tst=dldr_tst)
+
+    netp = ATRP(nc = KERNEL, bz = BATCH_SIZE) # initializes REG convnet; nc = input should have 1 channel
+    criterion1 = nn.BCELoss()
+    criterion2 = None
+    optimizer = optim.Adam(netp.parameters(), lr=0.0002)
+    arr_acc.append(accuracy)
+    arr_aucpr.append(aucpr)
+
+    print(f"finished tasked {i}")
 
 print("finished testing REG ATR\n")
 
-torch.save(netp, './saves/reg.pt')
+import matplotlib.pyplot as plt
 
-res_reg_txt = open(path_reg_sv, 'w')
-res_reg_txt.write(str(res))
-res_reg_txt.close()
+plt.plot(arr_epoch, arr_acc, label='accuracy', linestyle='-', marker='o', color='b')
+plt.plot(arr_epoch, arr_aucpr, label='aucpr', linestyle='--', marker='s', color='r')
+
+# Add labels and title
+plt.xlabel('Num epochs')
+plt.ylabel('Accuracy (Blue), AUCPR (Red)')
+plt.title('Plot of AUCPR and Accuracy with respect to num of epochs')
+
+# Add a legend
+plt.legend()
+
+# Add grid
+plt.grid(True)
+
+# Show the plot
+plt.show()
