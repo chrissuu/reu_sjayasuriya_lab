@@ -1,6 +1,7 @@
 from PIL import Image
 import torch
 import numpy as np
+from matplotlib import pyplot as plt
 from utils import *
 from Dataloader import generate_generators
 
@@ -22,9 +23,9 @@ for i, data in enumerate(dldr, 0):
 
 batch_pull_number = 10 # which part from the batch to pull from, 0 <= x < 20
 
-for i in range(101):
 
-    temp = save_data[batch_pull_number].numpy()
-    f = f_VHN(torch.tensor(temp), torch.tensor(vhn_wght))
-    img = Image.fromarray(np.array(f[0][i]))
-    img.show()
+
+temp = save_data[batch_pull_number].numpy()
+f = f_VHN(torch.tensor(temp), torch.tensor(vhn_wght))
+plt.imshow(np.array(f[0][50]))
+    

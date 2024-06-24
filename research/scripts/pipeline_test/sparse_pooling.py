@@ -32,8 +32,8 @@ device = (
 
 CLOUD = False
 LINUX = False
-HARDSTOP = 128 # how many imgs to use. 2 * HARDSTOP, balanced
-HARDSTOP_TST = 32
+HARDSTOP = 2 # how many imgs to use. 2 * HARDSTOP, balanced
+HARDSTOP_TST = 2
 BATCH_SIZE = 4 # MAKE SURE BATCH_SIZE ARE FACTORS OF HARDSTOP_TST AND HARDSTO
 QUBIT = "lightning.qubit" 
 KERNEL = 4
@@ -131,6 +131,7 @@ def generate_datum(train_images, n_layers, iters, skip):
                     # Assign expectation values to different channels of the output pixel (j/2, k/2)
                     for c in range(KERNEL):
                         tot[j // 2, k // 2, m //2, c] = q_results[c]
+                        # print(q_results[c].shape)
         return tot
     
     start = time.time()
@@ -250,7 +251,6 @@ class ATRP(nn.Module):
         self.N_output = N_output
         self.conv1 = nn.Conv3d(nc, N_filters, kernel_size = (3, 3, 3), stride=(1, 2, 2), padding= (0, 1, 1))
         self.conv2 = nn.Conv3d(N_filters, N_filters, kernel_size = (3, 3, 3), stride=(1, 2, 2), padding= (0, 1, 1))
-        
         self.avgpool = nn.AvgPool3d(kernel_size = (6, 2, 2), stride= (1, 1, 1), padding= (0, 0, 0))
     
 
