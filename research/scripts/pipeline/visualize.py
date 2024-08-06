@@ -27,5 +27,7 @@ batch_pull_number = 10 # which part from the batch to pull from, 0 <= x < 20
 
 temp = save_data[batch_pull_number].numpy()
 f = f_VHN(torch.tensor(temp), torch.tensor(vhn_wght))
-plt.imshow(np.array(f[0][50]))
+c = plt.imshow(np.array(f[0][50]))
     
+plt.colorbar(c)
+plt.show()

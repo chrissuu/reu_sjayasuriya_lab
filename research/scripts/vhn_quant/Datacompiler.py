@@ -1,19 +1,10 @@
 import os
-import time
 import h5py
 import numpy as np
-import math
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-import random
-import torcheval
-from torcheval.metrics.functional import binary_auprc
-import matplotlib.pyplot as plt
 
-def generate_generators(data_root, hdf_data_path,BZ,IR,
-                        label_scheme='label'):
+def generate_compiler(data_root, hdf_data_path,BZ,IR,HARDSTOP,
+                        label_scheme='label' ):
     """
     Gathers all files and organize into train/validation/test. Each
        data subset is further organized by class. Converts file lists
@@ -36,20 +27,24 @@ def generate_generators(data_root, hdf_data_path,BZ,IR,
     
     #print('Allocating HDFs to train/valid/test...')
     
-
+    cnt = 0
     for filename in os.listdir(data_root):
         if not filename.endswith('.hdf'):
             continue
 
         # Extract the label using 'label_scheme' identifier
+        if len(files[0]) >= HARDSTOP and len(files[1]) >= HARDSTOP:
+            break
         label = int(int(filename.split('_')[3]) > 0)  # 0 = clutter (not manmade); 1 = target (manmade)
-
-        
             
         files[label].append(filename)
 
-    print(f"clutter len: {len(files[0])}")
-    print(f"target len: {len(files[1])}")       
+        cnt += 1
+
+        
+
+    print(f"Clutter len: {len(files[0])}")
+    print(f"Target len: {len(files[1])}")       
 
     # Wrap each file list into an iterable data generator that actually
     #     read the HDFs when __next__ is called:
@@ -89,23 +84,16 @@ class DataGenerator:
 
         self.dataset_size = self.clutter_len + self.target_len
         self.batch_size = BZ
-        self.bsz_by_class = int(self.batch_size / self.n_classes)
+        self.bsz_by_class = 0
+        self.iters = 0
+        # if self.batch_size % 2 != 0 or self.bsz_by_class % 2 != 0:
+        #     print('batch size is odd or not balanced... \nadding one to batch size')
+        #     self.batch_size = self.batch_size  + 1
+        #     self.bsz_by_class = math.floor(self.batch_size / self.n_classes)
 
-        if self.batch_size % 2 != 0 or self.bsz_by_class % 2 != 0:
-            print('batch size is odd or not balanced... \nadding one to batch size')
-            self.batch_size = self.batch_size  + 1
-            self.bsz_by_class = math.floor(self.batch_size / self.n_classes)
+        
 
-        n = 1
-        while n < 6:
-            if  self.bsz_by_class % 2 != 0:
-                print('batch size is not balanced... \nadding one to batch size')
-                self.batch_size = self.batch_size  + 1
-                self.bsz_by_class = math.floor(self.batch_size / self.n_classes)
-            else:
-                break
 
-# Convolutional Neural Network
 
         # print(self.batch_size, 'batch_size')
         # print(self.bsz_by_class, 'balance size')
@@ -185,20 +173,7 @@ class DataGenerator:
         x_center = self.chip_center(data_sample)
         return x_center
 
-    def perm_target_list(self, target_list):
-        if self.last_slice % self.target_len == 0:
-            print('target list permuted')
-            return np.random.permutation(target_list)
-        else:
-            return target_list
-        #return np.random.permutation(target_list)
-
-    def reset_list(self, target_list):
-
-        # Come up with a way to reset_list
-
-
-            return target_list
+    
 
     def data_loop(self, list_data):
 
@@ -244,35 +219,29 @@ class DataGenerator:
         # for n in range(self.bsz_by_class, self.target_len, self.bsz_by_class):
 
 
-        if self.last_slice <= self.clutter_len:
+        if self.iters < self.dataset_size:
             #print(self.last_slice, 'last slice')
 
-            if self.last_slice > self.target_len:
-                tlp = self.perm_target_list(self.target_list)
-                tl = self.reset_list(tlp)
+            if self.iters % 2 == 0:
+                data = self.readHDF(self.clutter_list[self.iters//2])
 
-                cl = self.clutter_list[self.first_slice:self.last_slice]
-
-                list_data = [cl, tl]
-
-                batch_data, batch_label = self.data_loop(list_data)
-
-            elif self.last_slice <= self.target_len :
-                tl = self.target_list[self.first_slice:self.last_slice]
-                cl = self.clutter_list[self.first_slice:self.last_slice]
+                data = self.preprocess(data)
 
 
-                list_data = [cl, tl]
+                batch_data, batch_label = data, torch.zeros(1)
 
+            else:
+                data = self.readHDF(self.target_list[self.iters//2])
 
-                batch_data, batch_label = self.data_loop(list_data)
+                data = self.preprocess(data)
+
+                batch_data, batch_label = data, torch.ones(1)
 
         else:
-            print('next epoch')
+            print('\nNEXT\n')
             raise StopIteration
 
-        self.first_slice += self.bsz_by_class
-        self.last_slice += self.bsz_by_class
+        self.iters += 1
         return batch_data, batch_label
         # , self.bsz_by_class, self.clutter_len, self.target_len, self.batch_size
 
