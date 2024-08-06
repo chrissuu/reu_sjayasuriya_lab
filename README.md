@@ -1,3 +1,5 @@
-A (possibly temporary) repository for my participation during Summer 2024 REU at ASU's SenSIP lab. 
+A repository storing all relevant code and snippets for my participation during an REU at SenSIP Labs @ ASU, Summer 2024, under the direction of Dr. Suren Jayasuriya. 
 
-Ad
+Big thanks to my mentors Greg Vetaw, Suren Jayasuriya, Glen Uehara, and Andreas Spanias. 
+
+Formalized project code can be found under the same profile /sparsequanv.
